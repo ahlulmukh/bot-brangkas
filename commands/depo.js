@@ -1,5 +1,5 @@
 const { saveVaultData, vault } = require("../utils/vaultUtils");
-const { updateVaultChannel } = require("../index"); // Import fungsi dari index.js
+const { updateVaultChannel } = require("../utils/updateUtils");
 
 module.exports = {
   name: "depo",

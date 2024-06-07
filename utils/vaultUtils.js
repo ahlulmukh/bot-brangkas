@@ -1,13 +1,12 @@
+const { EmbedBuilder } = require("discord.js");
 const fs = require("fs");
 const path = require("path");
 
 const dataPath = path.join(__dirname, "../data/vaultData.json");
 
 let vault = {
-  kayu: 1000,
-  getah: 2000,
-  "papan kayu": 500,
-  botol: 1000,
+  "barang disnaker": { kayu: 1000, botol: 500 },
+  "barang illegal": { "kunyit saset": 200, "pistol de": 5 },
 };
 
 function saveVaultData() {
@@ -20,9 +19,22 @@ function loadVaultData() {
   }
 }
 
+function createVaultEmbed() {
+  const embed = new EmbedBuilder()
+    .setColor("#0099ff")
+    .setTitle("Brankas")
+    .setDescription("Berikut adalah isi brankas saat ini:")
+    .addFields({
+      name: "Barang Disnaker",
+      value: `\n${vault.kayu}, ${vault["papan kayu"]}`,
+    });
+  return embed;
+}
+
 loadVaultData();
 
 module.exports = {
   saveVaultData,
   vault,
+  createVaultEmbed,
 };
