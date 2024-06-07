@@ -22,12 +22,25 @@ function loadVaultData() {
 function createVaultEmbed() {
   const embed = new EmbedBuilder()
     .setColor("#0099ff")
-    .setTitle("Brankas")
-    .setDescription("Berikut adalah isi brankas saat ini:")
-    .addFields({
-      name: "Barang Disnaker",
-      value: `\n${vault.kayu}, ${vault["papan kayu"]}`,
-    });
+    .setTitle("Brangkas Mamoru")
+    .setDescription("Berikut adalah isi brankas saat ini:");
+  for (const [category, items] of Object.entries(vault)) {
+    let fieldValue = "";
+    for (const [item, quantity] of Object.entries(items)) {
+      fieldValue += `${item}: ${quantity}\n`;
+    }
+    embed
+      .addFields({
+        name: category,
+        value: fieldValue,
+        inline: true,
+      })
+      .setTimestamp()
+      .setFooter({
+        text: "Mamoru Jaya Jaya",
+      });
+  }
+
   return embed;
 }
 
