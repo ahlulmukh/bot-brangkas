@@ -55,7 +55,7 @@ client.once("ready", async () => {
       console.log("Channel tidak ditemukan.");
     }
 
-    // Register slash command
+    // Register slash commands
     await registerSlashCommands(guild);
   } catch (error) {
     console.log("Guild atau Channel tidak ditemukan.", error);
@@ -125,6 +125,58 @@ async function registerSlashCommands(guild) {
           name: "item",
           type: 3, // STRING type
           description: "Nama item",
+          required: true,
+        },
+      ],
+    },
+    {
+      name: "depo",
+      description: "Menambahkan item ke brankas",
+      options: [
+        {
+          name: "category",
+          type: 3, // STRING type
+          description: "Kategori item",
+          required: true,
+          autocomplete: true,
+        },
+        {
+          name: "item",
+          type: 3, // STRING type
+          description: "Nama item",
+          required: true,
+          autocomplete: true,
+        },
+        {
+          name: "amount",
+          type: 4, // INTEGER type
+          description: "Jumlah item",
+          required: true,
+        },
+      ],
+    },
+    {
+      name: "wd",
+      description: "Mengambil item dari brankas",
+      options: [
+        {
+          name: "category",
+          type: 3, // STRING type
+          description: "Kategori item",
+          required: true,
+          autocomplete: true,
+        },
+        {
+          name: "item",
+          type: 3, // STRING type
+          description: "Nama item",
+          required: true,
+          autocomplete: true,
+        },
+        {
+          name: "amount",
+          type: 4, // INTEGER type
+          description: "Jumlah item",
           required: true,
         },
       ],
