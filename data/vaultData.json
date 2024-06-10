@@ -1,11 +1,12 @@
 {
-    "Disnaker": {
-        "kayu": 3000,
-        "botol": 500,
-        "Cairan": 0
-    },
-    "Illegal": {
-        "kunyit saset": 200,
-        "pistol de": 5
-    }
+  "Disnaker": {
+    "kayu": 3000,
+    "botol": 500,
+    "Cairan": 0,
+    "Kayu": 0
+  },
+  "Illegal": {
+    "kunyit saset": 200,
+    "pistol de": 5
+  }
 }

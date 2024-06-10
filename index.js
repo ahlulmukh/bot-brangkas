@@ -54,6 +54,9 @@ client.once("ready", async () => {
     } else {
       console.log("Channel tidak ditemukan.");
     }
+
+    // Register slash command
+    await registerSlashCommands(guild);
   } catch (error) {
     console.log("Guild atau Channel tidak ditemukan.", error);
   }
@@ -77,4 +80,56 @@ client.on("messageCreate", async (message) => {
   }
 });
 
+client.on("interactionCreate", async (interaction) => {
+  if (interaction.isAutocomplete()) {
+    const command = client.commands.get(interaction.commandName);
+    if (command && command.autocomplete) {
+      try {
+        await command.autocomplete(interaction);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  } else if (interaction.isCommand()) {
+    const command = client.commands.get(interaction.commandName);
+    if (command) {
+      try {
+        await command.execute(interaction);
+      } catch (error) {
+        console.error(error);
+        await interaction.reply({
+          content: "Terjadi kesalahan saat menjalankan perintah tersebut.",
+          ephemeral: true,
+        });
+      }
+    }
+  }
+});
+
 client.login(token);
+
+async function registerSlashCommands(guild) {
+  const commands = [
+    {
+      name: "tambahitem",
+      description: "Menambahkan item baru ke kategori tertentu di brankas",
+      options: [
+        {
+          name: "category",
+          type: 3, // STRING type
+          description: "Kategori item",
+          required: true,
+          autocomplete: true,
+        },
+        {
+          name: "item",
+          type: 3, // STRING type
+          description: "Nama item",
+          required: true,
+        },
+      ],
+    },
+  ];
+
+  await guild.commands.set(commands);
+}

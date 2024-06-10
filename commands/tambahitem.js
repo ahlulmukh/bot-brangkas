@@ -4,27 +4,41 @@ const { updateVaultChannel } = require("../utils/updateUtils");
 module.exports = {
   name: "tambahitem",
   description: "Menambahkan item baru ke kategori tertentu di brankas",
-  async execute(message, args) {
-    const category = args[0];
-    const item = args[1];
+  async execute(interaction) {
+    const category = interaction.options.getString("category");
+    const item = interaction.options.getString("item");
 
     if (!vault.hasOwnProperty(category)) {
-      message.channel.send(`Kategori ${category} tidak ada dalam brankas.`);
+      await interaction.reply({
+        content: `Kategori ${category} tidak ada dalam brankas.`,
+        ephemeral: true,
+      });
       return;
     }
 
     if (vault[category].hasOwnProperty(item)) {
-      message.channel.send(
-        `Item ${item} sudah ada dalam kategori ${category}.`
-      );
+      await interaction.reply({
+        content: `Item ${item} sudah ada dalam kategori ${category}.`,
+        ephemeral: true,
+      });
       return;
     }
 
     vault[category][item] = 0;
     saveVaultData();
-    await updateVaultChannel(message.client);
-    message.channel.send(
-      `Item ${item} telah ditambahkan ke kategori ${category} dengan jumlah 0.`
+    await updateVaultChannel(interaction.client);
+    await interaction.reply({
+      content: `Item ${item} telah ditambahkan ke kategori ${category} dengan jumlah 0.`,
+    });
+  },
+  async autocomplete(interaction) {
+    const focusedValue = interaction.options.getFocused();
+    const choices = Object.keys(vault);
+    const filtered = choices.filter((choice) =>
+      choice.startsWith(focusedValue)
+    );
+    await interaction.respond(
+      filtered.map((choice) => ({ name: choice, value: choice }))
     );
   },
 };
