@@ -5,15 +5,27 @@ module.exports = {
   name: "depo",
   description: "Menambahkan item ke brankas",
   async execute(message, args) {
-    const item = args[0];
-    const amount = parseInt(args[1], 10);
-    if (!vault.hasOwnProperty(item)) {
-      message.channel.send(`Item ${item} tidak ada dalam brankas.`);
+    const category = args[0];
+    const item = args[1];
+    const amount = parseInt(args[2], 10);
+
+    if (!vault.hasOwnProperty(category)) {
+      message.channel.send(`Kategori ${category} tidak ada dalam brankas.`);
       return;
     }
-    vault[item] += amount;
+
+    if (!vault[category].hasOwnProperty(item)) {
+      message.channel.send(
+        `Item ${item} tidak ada dalam kategori ${category}.`
+      );
+      return;
+    }
+
+    vault[category][item] += amount;
     saveVaultData();
     await updateVaultChannel(message.client);
-    message.channel.send(`Item ${item} sekarang menjadi ${vault[item]}.`);
+    message.channel.send(
+      `Item ${item} sekarang menjadi ${vault[category][item]}.`
+    );
   },
 };

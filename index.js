@@ -70,7 +70,7 @@ client.on("messageCreate", async (message) => {
 
   try {
     await command.execute(message, args);
-    await updateVaultChannel(client);
+    await updateVaultChannel(message.client);
   } catch (error) {
     console.error(error);
     message.reply("Terjadi kesalahan saat menjalankan perintah tersebut.");

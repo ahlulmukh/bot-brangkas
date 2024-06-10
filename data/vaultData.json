@@ -1,9 +1,10 @@
 {
-    "Barang Disnaker": {
-        "kayu": 1000,
-        "botol": 500
+    "Disnaker": {
+        "kayu": 3000,
+        "botol": 500,
+        "Cairan": 0
     },
-    "Barang Illegal": {
+    "Illegal": {
         "kunyit saset": 200,
         "pistol de": 5
     }

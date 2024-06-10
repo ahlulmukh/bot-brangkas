@@ -6,8 +6,11 @@ module.exports = {
   description: "Menampilkan isi brankas",
   execute(message) {
     let vaultContents = "Isi brankas saat ini:\n";
-    for (const [item, amount] of Object.entries(vault)) {
-      vaultContents += `${item}: ${amount}\n`;
+    for (const [category, items] of Object.entries(vault)) {
+      vaultContents += `${category}:\n`;
+      for (const [item, amount] of Object.entries(items)) {
+        vaultContents += `  ${item}: ${amount}\n`;
+      }
     }
     const embed = new EmbedBuilder()
       .setTitle("Isi Brankas")
