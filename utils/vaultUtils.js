@@ -42,7 +42,8 @@ function createVaultEmbed() {
   const embed = new EmbedBuilder()
     .setColor("#0099ff")
     .setTitle("Brangkas Mamoru")
-    .setDescription("Berikut adalah isi brankas saat ini:");
+    .setDescription("Brangkas Terupdate Saat Ini :")
+    .setThumbnail("https://i.ibb.co.com/YPdyVzQ/MAMORU-BULAT-NO-BG.png");
   for (const [category, items] of Object.entries(vault)) {
     let fieldValue = "";
     for (const [item, quantity] of Object.entries(items)) {
@@ -56,7 +57,8 @@ function createVaultEmbed() {
       })
       .setTimestamp()
       .setFooter({
-        text: "Mamoru Jaya Jaya",
+        text: "Mamoru The Black Moonlight",
+        iconURL: "https://i.ibb.co.com/YPdyVzQ/MAMORU-BULAT-NO-BG.png",
       });
   }
 

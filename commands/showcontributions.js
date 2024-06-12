@@ -3,10 +3,10 @@ const { contributions } = require("../utils/vaultUtils");
 
 module.exports = {
   name: "showcontributions",
-  description: "Menampilkan kontribusi pengguna",
+  description: "Data-Data anggota yang menyetor",
   async execute(interaction) {
     const embed = new EmbedBuilder()
-      .setTitle("Kontribusi Pengguna")
+      .setTitle("Kontribusi Anggota")
       .setColor("#00FF00");
 
     for (const [userId, data] of Object.entries(contributions)) {

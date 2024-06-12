@@ -64,7 +64,7 @@ module.exports = {
     saveContributionsData();
     await updateVaultChannel(interaction.client);
     await interaction.reply({
-      content: `Item ${item} sekarang menjadi ${vault[category][item]}.`,
+      content: `Item ${item} berhasil diwd, total sekarang ${vault[category][item]}.`,
     });
   },
   async autocomplete(interaction) {
