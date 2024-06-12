@@ -109,6 +109,10 @@ client.login(token);
 async function registerSlashCommands(guild) {
   const commands = [
     {
+      name: "showcontributions",
+      description: "Menampilkan kontribusi pengguna",
+    },
+    {
       name: "tambahitem",
       description: "Menambahkan item baru ke kategori tertentu di brankas",
       options: [

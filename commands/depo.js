@@ -1,4 +1,9 @@
-const { saveVaultData, vault } = require("../utils/vaultUtils");
+const {
+  saveVaultData,
+  vault,
+  saveContributionsData,
+  contributions,
+} = require("../utils/vaultUtils");
 const { updateVaultChannel } = require("../utils/updateUtils");
 
 module.exports = {
@@ -8,6 +13,8 @@ module.exports = {
     const category = interaction.options.getString("category");
     const item = interaction.options.getString("item");
     const amount = interaction.options.getInteger("amount");
+    const userId = interaction.user.id;
+    const userName = interaction.user.username;
 
     if (!vault.hasOwnProperty(category)) {
       await interaction.reply({
@@ -26,7 +33,27 @@ module.exports = {
     }
 
     vault[category][item] += amount;
+
+    if (!contributions[userId]) {
+      contributions[userId] = {
+        userName: userName,
+        depo: {},
+        wd: {},
+      };
+    }
+
+    if (!contributions[userId].depo[category]) {
+      contributions[userId].depo[category] = {};
+    }
+
+    if (!contributions[userId].depo[category][item]) {
+      contributions[userId].depo[category][item] = 0;
+    }
+
+    contributions[userId].depo[category][item] += amount;
+
     saveVaultData();
+    saveContributionsData();
     await updateVaultChannel(interaction.client);
     await interaction.reply({
       content: `Item ${item} sekarang menjadi ${vault[category][item]}.`,

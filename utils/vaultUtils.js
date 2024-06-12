@@ -2,20 +2,39 @@ const { EmbedBuilder } = require("discord.js");
 const fs = require("fs");
 const path = require("path");
 
-const dataPath = path.join(__dirname, "../data/vaultData.json");
+const vaultDataPath = path.join(__dirname, "../data/vaultData.json");
+const contributionsDataPath = path.join(
+  __dirname,
+  "../data/contributionsData.json"
+);
 
 let vault = {
   "barang disnaker": { kayu: 1000, botol: 500 },
   "barang illegal": { "kunyit saset": 200, "pistol de": 5 },
 };
 
+let contributions = {};
+
 function saveVaultData() {
-  fs.writeFileSync(dataPath, JSON.stringify(vault, null, 2));
+  fs.writeFileSync(vaultDataPath, JSON.stringify(vault, null, 2));
 }
 
 function loadVaultData() {
-  if (fs.existsSync(dataPath)) {
-    vault = JSON.parse(fs.readFileSync(dataPath));
+  if (fs.existsSync(vaultDataPath)) {
+    vault = JSON.parse(fs.readFileSync(vaultDataPath));
+  }
+}
+
+function saveContributionsData() {
+  fs.writeFileSync(
+    contributionsDataPath,
+    JSON.stringify(contributions, null, 2)
+  );
+}
+
+function loadContributionsData() {
+  if (fs.existsSync(contributionsDataPath)) {
+    contributions = JSON.parse(fs.readFileSync(contributionsDataPath));
   }
 }
 
@@ -45,9 +64,12 @@ function createVaultEmbed() {
 }
 
 loadVaultData();
+loadContributionsData();
 
 module.exports = {
   saveVaultData,
   vault,
   createVaultEmbed,
+  saveContributionsData,
+  contributions,
 };
