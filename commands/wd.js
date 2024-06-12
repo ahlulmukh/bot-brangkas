@@ -5,11 +5,19 @@ const {
   contributions,
 } = require("../utils/vaultUtils");
 const { updateVaultChannel } = require("../utils/updateUtils");
+const { channelWd } = require("../config.json");
 
 module.exports = {
   name: "wd",
   description: "Mengambil item dari brankas",
   async execute(interaction) {
+    if (interaction.channelId !== channelWd) {
+      await interaction.reply({
+        content: `Command ini hanya dapat digunakan di channel <#${channelWd}>.`,
+        ephemeral: true,
+      });
+      return;
+    }
     const category = interaction.options.getString("category");
     const item = interaction.options.getString("item");
     const amount = interaction.options.getInteger("amount");
@@ -64,7 +72,7 @@ module.exports = {
     saveContributionsData();
     await updateVaultChannel(interaction.client);
     await interaction.reply({
-      content: `Item ${item} berhasil diwd, total sekarang ${vault[category][item]}.`,
+      content: `Withdrawal **${item}** Sebesar **${amount}**, sisa **${item}** sekarang **${vault[category][item]}**.`,
     });
   },
   async autocomplete(interaction) {

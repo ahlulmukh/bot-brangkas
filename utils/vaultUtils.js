@@ -40,7 +40,7 @@ function loadContributionsData() {
 
 function createVaultEmbed() {
   const embed = new EmbedBuilder()
-    .setColor("#0099ff")
+    .setColor("#cc9900")
     .setTitle("Brangkas Mamoru")
     .setDescription("Brangkas Terupdate Saat Ini :")
     .setThumbnail("https://i.ibb.co.com/YPdyVzQ/MAMORU-BULAT-NO-BG.png");
