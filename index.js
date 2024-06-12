@@ -14,7 +14,7 @@ const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent, // Perlu untuk membaca konten pesan
+    GatewayIntentBits.MessageContent,
   ],
 });
 
@@ -38,7 +38,6 @@ client.once("ready", async () => {
     const channel = await guild.channels.fetch(channelId);
 
     if (channel) {
-      // Jika pesan sudah ada, ambil pesan tersebut
       if (messageData.messageId) {
         try {
           const message = await channel.messages.fetch(messageData.messageId);
@@ -48,7 +47,6 @@ client.once("ready", async () => {
           createVaultMessage(channel);
         }
       } else {
-        // Jika tidak ada pesan yang tersimpan, buat pesan baru
         createVaultMessage(channel);
       }
     } else {
