@@ -1,0 +1,7 @@
+{
+    "token": "your_token_bot",
+    "guildId": "your_discord_channel",
+    "channelId": "channel_view_data",
+    "channelDepo": "channel_depo",
+    "channelWd": "channel_wd"
+}
