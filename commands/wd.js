@@ -19,7 +19,7 @@ const clipPeluruDEComponents = {
 
 const clipPeluruPython = {
   "Andaliman Saset": 2,
-  "Minya Paket": 8,
+  "Minyak Paket": 8,
   "Papan Kemasan": 12,
   Emas: 15,
   Besi: 25,
@@ -117,6 +117,162 @@ module.exports = {
       await interaction.reply({
         content: `Withdrawal **${item}** sebesar **${amount}** berhasil.`,
       });
+    } else if (item === "clip peluru python") {
+      for (const [component, qty] of Object.entries(clipPeluruPython)) {
+        const totalQty = qty * amount;
+        let found = false;
+        for (const category of Object.keys(vault)) {
+          if (vault[category].hasOwnProperty(component)) {
+            if (vault[category][component] < totalQty) {
+              await interaction.reply({
+                content: `Jumlah ${component} tidak cukup untuk melakukan penarikan ${amount} clip peluru python.`,
+                ephemeral: true,
+              });
+              return;
+            }
+            vault[category][component] -= totalQty;
+            found = true;
+            break;
+          }
+        }
+        if (!found) {
+          await interaction.reply({
+            content: `${component} tidak ditemukan dalam brankas.`,
+            ephemeral: true,
+          });
+          return;
+        }
+      }
+
+      // Mencatat kontribusi pengguna untuk "clip peluru de"
+      if (!contributions[userId]) {
+        contributions[userId] = {
+          userName: userName,
+          depo: {},
+          wd: {},
+        };
+      }
+
+      if (!contributions[userId].wd["Clip Peluru Python"]) {
+        contributions[userId].wd["Clip Peluru Python"] = 0;
+      }
+
+      contributions[userId].wd["Clip Peluru Python"] += amount;
+
+      // Menyimpan data brankas dan kontribusi
+      saveVaultData();
+      saveContributionsData();
+
+      // Memperbarui channel brankas
+      await updateVaultChannel(interaction.client);
+
+      await interaction.reply({
+        content: `Withdrawal **${item}** sebesar **${amount}** berhasil.`,
+      });
+    } else if (item === "bahan vest") {
+      for (const [component, qty] of Object.entries(vest)) {
+        const totalQty = qty * amount;
+        let found = false;
+        for (const category of Object.keys(vault)) {
+          if (vault[category].hasOwnProperty(component)) {
+            if (vault[category][component] < totalQty) {
+              await interaction.reply({
+                content: `Jumlah ${component} tidak cukup untuk melakukan penarikan ${amount} bahan vest.`,
+                ephemeral: true,
+              });
+              return;
+            }
+            vault[category][component] -= totalQty;
+            found = true;
+            break;
+          }
+        }
+        if (!found) {
+          await interaction.reply({
+            content: `${component} tidak ditemukan dalam brankas.`,
+            ephemeral: true,
+          });
+          return;
+        }
+      }
+
+      // Mencatat kontribusi pengguna untuk "clip peluru de"
+      if (!contributions[userId]) {
+        contributions[userId] = {
+          userName: userName,
+          depo: {},
+          wd: {},
+        };
+      }
+
+      if (!contributions[userId].wd["Bahan Vest"]) {
+        contributions[userId].wd["Bahan Vest"] = 0;
+      }
+
+      contributions[userId].wd["Bahan Vest"] += amount;
+
+      // Menyimpan data brankas dan kontribusi
+      saveVaultData();
+      saveContributionsData();
+
+      // Memperbarui channel brankas
+      await updateVaultChannel(interaction.client);
+
+      await interaction.reply({
+        content: `Withdrawal **${item}** sebesar **${amount}** berhasil.`,
+      });
+    } else if (item === "bahan ginseng") {
+      for (const [component, qty] of Object.entries(ginseng)) {
+        const totalQty = qty * amount;
+        let found = false;
+        for (const category of Object.keys(vault)) {
+          if (vault[category].hasOwnProperty(component)) {
+            if (vault[category][component] < totalQty) {
+              await interaction.reply({
+                content: `Jumlah ${component} tidak cukup untuk melakukan penarikan ${amount} bahan ginseng.`,
+                ephemeral: true,
+              });
+              return;
+            }
+            vault[category][component] -= totalQty;
+            found = true;
+            break;
+          }
+        }
+        if (!found) {
+          await interaction.reply({
+            content: `${component} tidak ditemukan dalam brankas.`,
+            ephemeral: true,
+          });
+          return;
+        }
+      }
+
+      // Mencatat kontribusi pengguna untuk "clip peluru de"
+      if (!contributions[userId]) {
+        contributions[userId] = {
+          userName: userName,
+          depo: {},
+          wd: {},
+        };
+      }
+
+      if (!contributions[userId].wd["Bahan Ginseng"]) {
+        contributions[userId].wd["Bahan Ginseng"] = 0;
+      }
+
+      contributions[userId].wd["Bahan Ginseng"] += amount;
+
+      // Menyimpan data brankas dan kontribusi
+      saveVaultData();
+      saveContributionsData();
+
+      // Memperbarui channel brankas
+      await updateVaultChannel(interaction.client);
+
+      await interaction.reply({
+        content: `Withdrawal **${item}** sebesar **${amount}** berhasil.`,
+      });
     } else {
       // Jika item bukan "clip peluru de", lanjutkan dengan penarikan kategori seperti biasa
       const category = interaction.options.getString("category");
@@ -185,7 +341,12 @@ module.exports = {
     if (focusedOption.name === "item") {
       const category = interaction.options.getString("category");
       if (category === "Crafting") {
-        choices = ["clip peluru de"];
+        choices = [
+          "clip peluru de",
+          "clip peluru python",
+          "bahan vest",
+          "bahan ginseng",
+        ];
       } else {
         choices = Object.keys(vault[category]);
       }
