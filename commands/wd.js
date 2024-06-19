@@ -66,9 +66,12 @@ module.exports = {
 
     // Jika item adalah "clip peluru de", lakukan pengecekan komponen terlebih dahulu
     if (item === "clip peluru de") {
+      let totalWithdrawn = []; // Array untuk menyimpan total pengambilan bahan
+
       for (const [component, qty] of Object.entries(clipPeluruDEComponents)) {
         const totalQty = qty * amount;
         let found = false;
+
         for (const category of Object.keys(vault)) {
           if (vault[category].hasOwnProperty(component)) {
             if (vault[category][component] < totalQty) {
@@ -78,11 +81,14 @@ module.exports = {
               });
               return;
             }
+
+            // Mengurangi jumlah bahan dari brankas
             vault[category][component] -= totalQty;
             found = true;
             break;
           }
         }
+
         if (!found) {
           await interaction.reply({
             content: `${component} tidak ditemukan dalam brankas.`,
@@ -90,6 +96,9 @@ module.exports = {
           });
           return;
         }
+
+        // Menambahkan informasi total pengambilan bahan ke dalam array
+        totalWithdrawn.push(`${component}: ${totalQty}`);
       }
 
       // Mencatat kontribusi pengguna untuk "clip peluru de"
@@ -114,8 +123,13 @@ module.exports = {
       // Memperbarui channel brankas
       await updateVaultChannel(interaction.client);
 
+      // Membuat pesan yang memuat total pengambilan bahan
+      let totalMessage =
+        "Total pengambilan item:\n" + totalWithdrawn.join("\n");
+
+      // Mengirim balasan dengan informasi total pengambilan item
       await interaction.reply({
-        content: `Withdrawal **${item}** sebesar **${amount}** berhasil.`,
+        content: `Withdrawal **${item}** sebesar **${amount}** berhasil.\n${totalMessage}`,
       });
     } else if (item === "clip peluru python") {
       for (const [component, qty] of Object.entries(clipPeluruPython)) {
