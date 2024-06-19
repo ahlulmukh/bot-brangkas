@@ -17,6 +17,36 @@ const clipPeluruDEComponents = {
   Emas: 12,
 };
 
+const clipPeluruPython = {
+  "Andaliman Saset": 2,
+  "Minya Paket": 8,
+  "Papan Kemasan": 12,
+  Emas: 15,
+  Besi: 25,
+  Tembaga: 30,
+  Botol: 35,
+};
+
+const vest = {
+  Kulit: 2,
+  Berlian: 2,
+  "Cairan Karet": 3,
+  "Kunyit Saset": 5,
+  "Papan Kemasan": 17,
+  Emas: 20,
+  Pakaian: 24,
+  Besi: 25,
+  Botol: 29,
+  Tembaga: 35,
+};
+
+const ginseng = {
+  Garam: 2,
+  "Kunyit Saset": 2,
+  Gula: 3,
+  Botol: 4,
+};
+
 module.exports = {
   name: "wd",
   description: "Mengambil item dari brankas",
@@ -153,13 +183,14 @@ module.exports = {
     let choices = [];
 
     if (focusedOption.name === "item") {
-      choices = ["clip peluru de"]; // Menambahkan "clip peluru de" sebagai opsi item
       const category = interaction.options.getString("category");
-      if (vault.hasOwnProperty(category)) {
-        choices = choices.concat(Object.keys(vault[category]));
+      if (category === "Crafting") {
+        choices = ["clip peluru de"];
+      } else {
+        choices = Object.keys(vault[category]);
       }
     } else if (focusedOption.name === "category") {
-      choices = Object.keys(vault);
+      choices = Object.keys(vault).concat("Crafting");
     }
 
     const filtered = choices.filter((choice) =>
