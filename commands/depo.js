@@ -64,7 +64,7 @@ module.exports = {
     saveContributionsData();
     await updateVaultChannel(interaction.client);
     await interaction.reply({
-      content: `Deposit **${item}** sebesar **${amount}** berhasil, total **${item}** sekarang **${vault[category][item]}**.`,
+      content: `\`\`\`Deposit ${item} sebesar ${amount} berhasil, total ${item} sekarang ${vault[category][item]}.\`\`\``,
     });
   },
   async autocomplete(interaction) {
