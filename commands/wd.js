@@ -13,12 +13,12 @@ const clipPeluruDEComponents = {
   Botol: 30,
   "Minyak Paket": 7,
   "Papan Kemasan": 7,
-  "Andaliman Saset": 2,
+  "Paket Andaliman": 2,
   Emas: 12,
 };
 
 const clipPeluruPython = {
-  "Andaliman Saset": 2,
+  "Paket Andaliman": 2,
   "Minyak Paket": 8,
   "Papan Kemasan": 12,
   Emas: 15,
