@@ -47,7 +47,11 @@ function createVaultEmbed() {
   for (const [category, items] of Object.entries(vault)) {
     let fieldValue = "";
     for (const [item, quantity] of Object.entries(items)) {
-      fieldValue += `${item}: ${quantity}\n`;
+      const formattedQuantity =
+        item === "Uang Merah" || item === "Uang Putih"
+          ? `Rp. ${quantity.toLocaleString()}`
+          : quantity.toLocaleString();
+      fieldValue += `${item}: ${formattedQuantity}\n`;
     }
     embed
       .addFields({
