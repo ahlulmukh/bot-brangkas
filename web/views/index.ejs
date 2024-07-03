@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" type="text/css" href="/styles.css" />
+  </head>
+  <body>
+    <h1>Admin Dashboard</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Item</th>
+          <th>Quantity</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% for (let category in vault) { %> <% for (let item in vault[category])
+        { %>
+        <tr>
+          <td><%= category %></td>
+          <td><%= item %></td>
+          <td><%= vault[category][item] %></td>
+          <td>
+            <form action="/api/edit-item" method="post">
+              <input type="hidden" name="category" value="<%= category %>" />
+              <input type="hidden" name="item" value="<%= item %>" />
+              <input
+                type="number"
+                name="quantity"
+                value="<%= vault[category][item] %>"
+              />
+              <button type="submit">Update</button>
+            </form>
+          </td>
+        </tr>
+        <% } %> <% } %>
+      </tbody>
+    </table>
+  </body>
+</html>
