@@ -75,6 +75,7 @@ loadContributionsData();
 module.exports = {
   saveVaultData,
   vault,
+  loadVaultData,
   createVaultEmbed,
   saveContributionsData,
   contributions,

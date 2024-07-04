@@ -3,5 +3,6 @@
     "guildId": "your_discord_channel",
     "channelId": "channel_view_data",
     "channelDepo": "channel_depo",
-    "channelWd": "channel_wd"
+    "channelWd": "channel_wd",
+    "apiBaseUrl": "http://goldserver.my.id:1955"
 }

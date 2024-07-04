@@ -1,9 +1,11 @@
 const { Client, GatewayIntentBits, Collection } = require("discord.js");
 const fs = require("fs");
 const path = require("path");
-const { loadVaultData, vault } = require("./utils/vaultUtils");
+const axios = require("axios");
+const { loadVaultData, saveVaultData, vault } = require("./utils/vaultUtils");
 const { saveMessageData, messageData } = require("./utils/messageUtils");
-const { token, guildId, channelId } = require("./config.json");
+const { token, guildId, channelId, apiBaseUrl } = require("./config.json");
+
 const {
   updateVaultChannel,
   createVaultMessage,
@@ -53,8 +55,9 @@ client.once("ready", async () => {
       console.log("Channel tidak ditemukan.");
     }
 
-    // Register slash commands
     await registerSlashCommands(guild);
+
+    setInterval(checkForUpdates, 5000); // Cek setiap 5 detik
   } catch (error) {
     console.log("Guild atau Channel tidak ditemukan.", error);
   }
@@ -186,4 +189,20 @@ async function registerSlashCommands(guild) {
   ];
 
   await guild.commands.set(commands);
+}
+
+async function checkForUpdates() {
+  try {
+    const response = await axios.get(`${apiBaseUrl}/api/check-updates`);
+    const newData = response.data;
+
+    if (JSON.stringify(newData) !== JSON.stringify(vault)) {
+      Object.assign(vault, newData);
+      saveVaultData();
+      await updateVaultChannel(client);
+      console.log("Vault data updated from web dashboard");
+    }
+  } catch (error) {
+    console.error("Error checking for updates:", error);
+  }
 }

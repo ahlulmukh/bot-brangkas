@@ -1,6 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const { vault, saveVaultData } = require("../../bot/utils/vaultUtils");
+const {
+  vault,
+  saveVaultData,
+  loadVaultData,
+} = require("../../bot/utils/vaultUtils");
 
 router.post("/edit-item", (req, res) => {
   const { category, item, quantity } = req.body;
@@ -24,6 +28,11 @@ router.post("/edit-item", (req, res) => {
     success: true,
     message: `Item ${item} di kategori ${category} telah diperbarui dengan jumlah ${quantity}.`,
   });
+});
+
+router.get("/check-updates", (req, res) => {
+  loadVaultData();
+  res.json(vault);
 });
 
 module.exports = router;
