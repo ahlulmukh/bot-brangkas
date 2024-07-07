@@ -3,7 +3,7 @@
   <%- include('../layouts/sidebar', { user: user }) %>
   <div class="content">
     <%- include('../layouts/nav') %>
-    <div class="container-fluid pt-4 px-4">
+    <div class="container-fluid pt-4 px-4" id="tableContainer">
       <div class="row g-4">
         <div class="col-12">
           <div class="bg-light rounded h-100 p-4">
@@ -48,8 +48,43 @@
         </div>
       </div>
     </div>
-
-    <%- include('../layouts/footer') %>
-    <!-- Footer End -->
+    <%- include('../databrangkas/edit') %> <%- include('../layouts/footer') %>
   </div>
 </div>
+
+<script>
+  $(document).ready(function () {
+    $(".btn-edit").on("click", function () {
+      const category = $(this).data("category");
+      const item = $(this).data("item");
+      const quantity = $(this).data("quantity");
+
+      $("#kategori").val(category);
+      $("#namaitem").val(item);
+      $("#quantity").val(quantity);
+
+      $("#tableContainer").addClass("d-none");
+      $("#editFormContainer").removeClass("d-none");
+    });
+
+    $("#updateForm").on("submit", function (e) {
+      e.preventDefault();
+      const category = $("#kategori").val();
+      const item = $("#namaitem").val();
+      const quantity = $("#quantity").val();
+
+      $.ajax({
+        type: "POST",
+        url: "/api/edit-item",
+        data: { category, item, quantity },
+        success: function (response) {
+          alert(response.message);
+          location.reload();
+        },
+        error: function (xhr) {
+          alert("Error: " + xhr.responseJSON.error);
+        },
+      });
+    });
+  });
+</script>
