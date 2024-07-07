@@ -1,54 +1,10 @@
-<%- include('partials/header', { title: 'Dashboard Mamoru' }) %>
+<%- include('layouts/header', { title: 'Dashboard Mamoru' }) %>
 <div class="container-xxl position-relative bg-white d-flex p-0">
   <!-- Sidebar Start -->
-  <%- include('partials/sidebar', { user: user }) %>
+  <%- include('layouts/sidebar', { user: user }) %>
   <!-- Sidebar End -->
-
   <div class="content">
-    <!-- Navbar Start -->
-    <nav
-      class="navbar navbar-expand bg-light navbar-light sticky-top px-4 py-0"
-    >
-      <a href="/" class="navbar-brand d-flex d-lg-none me-4">
-        <h2 class="text-primary mb-0"><i class="fa fa-hashtag"></i></h2>
-      </a>
-      <a href="#" class="sidebar-toggler flex-shrink-0">
-        <i class="fa fa-bars"></i>
-      </a>
-      <form class="d-none d-md-flex ms-4">
-        <input
-          class="form-control border-0"
-          type="search"
-          placeholder="Search"
-        />
-      </form>
-      <div class="navbar-nav align-items-center ms-auto">
-        <div class="nav-item dropdown">
-          <a
-            href="#"
-            class="nav-link dropdown-toggle"
-            data-bs-toggle="dropdown"
-          >
-            <img
-              class="rounded-circle me-lg-2"
-              src="img/user.jpg"
-              alt=""
-              style="width: 40px; height: 40px"
-            />
-            <span class="d-none d-lg-inline-flex">John Doe</span>
-          </a>
-          <div
-            class="dropdown-menu dropdown-menu-end bg-light border-0 rounded-0 rounded-bottom m-0"
-          >
-            <a href="#" class="dropdown-item">My Profile</a>
-            <a href="#" class="dropdown-item">Settings</a>
-            <a href="#" class="dropdown-item">Log Out</a>
-          </div>
-        </div>
-      </div>
-    </nav>
-    <!-- Navbar End -->
-
+    <%- include('layouts/nav') %>
     <div id="mainContent">
       <div class="container-fluid pt-4 px-4">
         <div class="row g-4">
@@ -130,38 +86,8 @@
       <!-- Widgets End -->
     </div>
 
-    <!-- Form Edit -->
-    <%- include('partials/editForm') %>
     <!-- Footer Start -->
-    <%- include('partials/footer') %>
+    <%- include('layouts/footer') %>
     <!-- Footer End -->
   </div>
 </div>
-
-<script>
-  document
-    .getElementById("updateDataBtn")
-    .addEventListener("click", async () => {
-      try {
-        const response = await fetch("/api/table");
-        const tableHtml = await response.text();
-        document.getElementById("mainContent").innerHTML = tableHtml;
-      } catch (error) {
-        console.error("Error fetching table data:", error);
-      }
-    });
-
-  document.addEventListener("click", function (event) {
-    if (event.target.classList.contains("btn-edit")) {
-      const category = event.target.getAttribute("data-category");
-      const item = event.target.getAttribute("data-item");
-      const quantity = event.target.getAttribute("data-quantity");
-
-      document.getElementById("editForm").classList.remove("d-none");
-      document.getElementById("mainContent").classList.add("d-none");
-      document.getElementById("kategori").value = category;
-      document.getElementById("namaitem").value = item;
-      document.getElementById("quantity").value = quantity;
-    }
-  });
-</script>

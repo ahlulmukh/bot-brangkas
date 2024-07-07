@@ -1,0 +1,55 @@
+<%- include('../layouts/header', { title: 'Dashboard Mamoru' }) %>
+<div class="container-xxl position-relative bg-white d-flex p-0">
+  <%- include('../layouts/sidebar', { user: user }) %>
+  <div class="content">
+    <%- include('../layouts/nav') %>
+    <div class="container-fluid pt-4 px-4">
+      <div class="row g-4">
+        <div class="col-12">
+          <div class="bg-light rounded h-100 p-4">
+            <h6 class="mb-4">Data Brangkas</h6>
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">No</th>
+                    <th scope="col">Kategori</th>
+                    <th scope="col">Item</th>
+                    <th scope="col">Total</th>
+                    <th scope="col">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% vault.categories.forEach((category, catIndex) => { %> <%
+                  category.items.forEach((item, itemIndex) => { %>
+                  <tr>
+                    <th scope="row">
+                      <%= catIndex * category.items.length + itemIndex + 1 %>
+                    </th>
+                    <td><%= category.name %></td>
+                    <td><%= item.name %></td>
+                    <td><%= item.quantity %></td>
+                    <td>
+                      <button
+                        class="btn btn-primary btn-edit"
+                        data-category="<%= category.name %>"
+                        data-item="<%= item.name %>"
+                        data-quantity="<%= item.quantity %>"
+                      >
+                        Edit
+                      </button>
+                    </td>
+                  </tr>
+                  <% }) %> <% }) %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <%- include('../layouts/footer') %>
+    <!-- Footer End -->
+  </div>
+</div>

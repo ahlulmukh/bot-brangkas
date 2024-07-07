@@ -7,6 +7,7 @@ const mongoose = require("mongoose");
 const apiRouter = require("./routes/api"); // Import router API
 const authRouter = require("./routes/auth"); // Import router Auth
 const { isAuthenticated, isPengurus } = require("./middleware/auth");
+const Vault = require("../models/Vault");
 
 const app = express();
 const port = 3000;
@@ -65,6 +66,17 @@ app.use((req, res, next) => {
 // Route untuk login
 app.get("/login", (req, res) => {
   res.render("login");
+});
+
+// Route untuk login
+app.get("/table", async (req, res) => {
+  try {
+    const vault = await Vault.findOne();
+    res.render("databrangkas/table", { vault });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
 });
 
 // Route untuk login

@@ -56,14 +56,4 @@ router.get("/vault-data", async (req, res) => {
   }
 });
 
-router.get("/table", async (req, res) => {
-  try {
-    const vault = await Vault.findOne();
-    res.render("partials/table", { vault });
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Internal Server Error");
-  }
-});
-
 module.exports = router;

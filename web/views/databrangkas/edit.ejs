@@ -35,38 +35,3 @@
   </div>
 </div>
 <!-- Form End -->
-
-<script>
-  document
-    .getElementById("updateForm")
-    .addEventListener("submit", async function (event) {
-      event.preventDefault();
-
-      const category = document.getElementById("kategori").value;
-      const item = document.getElementById("namaitem").value;
-      const quantity = document.getElementById("quantity").value;
-
-      try {
-        const response = await fetch("/api/edit-item", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ category, item, quantity }),
-        });
-
-        const result = await response.json();
-        if (result.success) {
-          alert("Data updated successfully");
-          // Hide edit form and show table data
-          document.getElementById("editForm").classList.add("d-none");
-          document.getElementById("mainContent").classList.remove("d-none");
-          document.getElementById("updateDataBtn").click();
-        } else {
-          alert("Error updating data: " + result.error);
-        }
-      } catch (error) {
-        console.error("Error updating data:", error);
-      }
-    });
-</script>
