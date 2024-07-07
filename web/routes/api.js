@@ -2,8 +2,71 @@ const express = require("express");
 const router = express.Router();
 const Vault = require("../../models/Vault");
 
-// API Endpoint untuk mengedit data brankas
-// API Endpoint untuk mengedit data brankas
+// API Endpoint untuk menambahkan kategori baru
+router.post("/add-category", async (req, res) => {
+  const { category } = req.body;
+
+  try {
+    const vault = await Vault.findOne();
+    if (!vault) {
+      const newVault = new Vault({
+        categories: [{ name: category, items: [] }],
+      });
+      await newVault.save();
+    } else {
+      if (vault.categories.find((cat) => cat.name === category)) {
+        return res
+          .status(400)
+          .json({ error: `Kategori ${category} sudah ada.` });
+      }
+      vault.categories.push({ name: category, items: [] });
+      await vault.save();
+    }
+
+    return res.json({
+      success: true,
+      message: `Kategori ${category} berhasil ditambahkan.`,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+// API Endpoint untuk menambahkan item baru ke kategori
+router.post("/add-item", async (req, res) => {
+  const { category, item, quantity } = req.body;
+
+  try {
+    const vault = await Vault.findOne();
+    if (!vault) {
+      return res.status(400).json({ error: `Kategori ${category} tidak ada.` });
+    }
+
+    const categoryDoc = vault.categories.find((cat) => cat.name === category);
+    if (!categoryDoc) {
+      return res.status(400).json({ error: `Kategori ${category} tidak ada.` });
+    }
+
+    if (categoryDoc.items.find((itm) => itm.name === item)) {
+      return res
+        .status(400)
+        .json({ error: `Item ${item} sudah ada dalam kategori ${category}.` });
+    }
+
+    categoryDoc.items.push({ name: item, quantity: parseInt(quantity, 10) });
+    await vault.save();
+
+    return res.json({
+      success: true,
+      message: `Item ${item} berhasil ditambahkan ke kategori ${category} dengan jumlah ${quantity}.`,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
 router.post("/edit-item", async (req, res) => {
   const { category, item, quantity } = req.body;
 

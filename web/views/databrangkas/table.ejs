@@ -8,6 +8,12 @@
         <div class="col-12">
           <div class="bg-light rounded h-100 p-4">
             <h6 class="mb-4">Data Brangkas</h6>
+            <button class="btn btn-success mb-3" id="btn-add-category">
+              Tambah Kategori
+            </button>
+            <button class="btn btn-success mb-3" id="btn-add-item">
+              Tambah Item
+            </button>
             <div class="table-responsive">
               <table class="table">
                 <thead>
@@ -48,7 +54,9 @@
         </div>
       </div>
     </div>
-    <%- include('../databrangkas/edit') %> <%- include('../layouts/footer') %>
+    <%- include('../databrangkas/edit') %> <%-
+    include('../databrangkas/tambahkategori') %> <%-
+    include('../databrangkas/tambahitem') %> <%- include('../layouts/footer') %>
   </div>
 </div>
 
@@ -76,6 +84,56 @@
       $.ajax({
         type: "POST",
         url: "/api/edit-item",
+        data: { category, item, quantity },
+        success: function (response) {
+          alert(response.message);
+          location.reload();
+        },
+        error: function (xhr) {
+          alert("Error: " + xhr.responseJSON.error);
+        },
+      });
+    });
+
+    $("#btn-add-category").on("click", function () {
+      $("#tableContainer").addClass("d-none");
+      $("#itemFormContainer").addClass("d-none");
+      $("#categoryFormContainer").removeClass("d-none");
+    });
+
+    $("#btn-add-item").on("click", function () {
+      $("#tableContainer").addClass("d-none");
+      $("#categoryFormContainer").addClass("d-none");
+      $("#itemFormContainer").removeClass("d-none");
+    });
+
+    $("#addCategoryForm").on("submit", function (e) {
+      e.preventDefault();
+      const category = $("#newCategory").val();
+
+      $.ajax({
+        type: "POST",
+        url: "/api/add-category",
+        data: { category },
+        success: function (response) {
+          alert(response.message);
+          location.reload();
+        },
+        error: function (xhr) {
+          alert("Error: " + xhr.responseJSON.error);
+        },
+      });
+    });
+
+    $("#addItemForm").on("submit", function (e) {
+      e.preventDefault();
+      const category = $("#selectCategory").val();
+      const item = $("#newItem").val();
+      const quantity = $("#newQuantity").val();
+
+      $.ajax({
+        type: "POST",
+        url: "/api/add-item",
         data: { category, item, quantity },
         success: function (response) {
           alert(response.message);

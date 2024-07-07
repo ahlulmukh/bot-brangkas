@@ -1,0 +1,40 @@
+<div class="container-fluid pt-4 px-4 d-none" id="itemFormContainer">
+  <div class="row g-4">
+    <div class="col-sm-12 col-xl-6">
+      <div class="bg-light rounded h-100 p-4">
+        <h6 class="mb-4">Tambah Item</h6>
+        <form id="addItemForm">
+          <div class="row mb-3">
+            <label for="selectCategory" class="col-sm-2 col-form-label"
+              >Kategori</label
+            >
+            <div class="col-sm-10">
+              <select class="form-control" id="selectCategory">
+                <% vault.categories.forEach((category) => { %>
+                <option value="<%= category.name %>">
+                  <%= category.name %>
+                </option>
+                <% }) %>
+              </select>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <label for="newItem" class="col-sm-2 col-form-label">Item</label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" id="newItem" />
+            </div>
+          </div>
+          <div class="row mb-3">
+            <label for="newQuantity" class="col-sm-2 col-form-label"
+              >Total</label
+            >
+            <div class="col-sm-10">
+              <input type="number" class="form-control" id="newQuantity" />
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">Tambah Item</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
