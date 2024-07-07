@@ -2,7 +2,8 @@ const { Client, GatewayIntentBits, Collection } = require("discord.js");
 const fs = require("fs");
 const path = require("path");
 const axios = require("axios");
-const { loadVaultData, saveVaultData, vault } = require("./utils/vaultUtils");
+const mongoose = require("mongoose");
+const { loadVaultData, saveVaultData } = require("./utils/vaultUtils");
 const { saveMessageData, messageData } = require("./utils/messageUtils");
 const { token, guildId, channelId, apiBaseUrl } = require("./config.json");
 
@@ -32,6 +33,17 @@ for (const file of commandFiles) {
   client.commands.set(command.name, command);
 }
 
+mongoose
+  .connect(
+    "mongodb+srv://ahlulmukh:Mukh2001@cluster0.gch0omi.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    }
+  )
+  .then(() => console.log("MongoDB connected"))
+  .catch((err) => console.log(err));
+
 client.once("ready", async () => {
   console.log("Bot is online!");
 
@@ -43,7 +55,8 @@ client.once("ready", async () => {
       if (messageData.messageId) {
         try {
           const message = await channel.messages.fetch(messageData.messageId);
-          updateVaultMessage(message);
+          const vault = await loadVaultData();
+          updateVaultMessage(message, vault);
         } catch (error) {
           console.log("Pesan tidak ditemukan, membuat pesan baru.");
           createVaultMessage(channel);
@@ -55,8 +68,10 @@ client.once("ready", async () => {
       console.log("Channel tidak ditemukan.");
     }
 
+    // Register slash commands
     await registerSlashCommands(guild);
 
+    // Mulai mekanisme polling
     setInterval(checkForUpdates, 5000); // Cek setiap 5 detik
   } catch (error) {
     console.log("Guild atau Channel tidak ditemukan.", error);
@@ -196,10 +211,11 @@ async function checkForUpdates() {
     const response = await axios.get(`${apiBaseUrl}/api/check-updates`);
     const newData = response.data;
 
-    if (JSON.stringify(newData) !== JSON.stringify(vault)) {
-      Object.assign(vault, newData);
-      saveVaultData();
-      await updateVaultChannel(client);
+    const currentVault = await loadVaultData();
+    if (JSON.stringify(newData) !== JSON.stringify(currentVault)) {
+      Object.assign(currentVault, newData); // Update data dalam memori
+      await saveVaultData(currentVault); // Simpan perubahan jika diperlukan
+      await updateVaultChannel(client); // Update channel vault di Discord
       console.log("Vault data updated from web dashboard");
     }
   } catch (error) {

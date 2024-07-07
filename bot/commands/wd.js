@@ -1,9 +1,4 @@
-const {
-  saveVaultData,
-  vault,
-  saveContributionsData,
-  contributions,
-} = require("../utils/vaultUtils");
+const { Vault, Contribution } = require("../../models"); // Pastikan untuk memperbarui path sesuai dengan struktur proyek Anda
 const { updateVaultChannel } = require("../utils/updateUtils");
 const { channelWd } = require("../config.json");
 
@@ -102,24 +97,29 @@ module.exports = {
     const userId = interaction.user.id;
     const userName = interaction.user.username;
 
-    if (item === "Clip Peluru De") {
+    const vault = await Vault.findOne();
+
+    const processWithdrawal = async (components, item, multiplier = 1) => {
       let totalWithdrawn = [];
 
-      for (const [component, qty] of Object.entries(clipPeluruDEComponents)) {
-        const totalQty = qty * amount;
+      for (const [component, qty] of Object.entries(components)) {
+        const totalQty = qty * multiplier;
         let found = false;
 
-        for (const category of Object.keys(vault)) {
-          if (vault[category].hasOwnProperty(component)) {
-            if (vault[category][component] < totalQty) {
+        for (const categoryDoc of vault.categories) {
+          const itemDoc = categoryDoc.items.find(
+            (itm) => itm.name === component
+          );
+          if (itemDoc) {
+            if (itemDoc.quantity < totalQty) {
               await interaction.reply({
-                content: `Jumlah ${component} tidak cukup untuk melakukan penarikan ${amount} clip peluru de.`,
+                content: `Jumlah ${component} tidak cukup untuk melakukan penarikan ${amount} ${item}.`,
                 ephemeral: true,
               });
               return;
             }
 
-            vault[category][component] -= totalQty;
+            itemDoc.quantity -= totalQty;
             found = true;
             break;
           }
@@ -136,138 +136,25 @@ module.exports = {
         totalWithdrawn.push(`${component}: ${totalQty}`);
       }
 
-      if (!contributions[userId]) {
-        contributions[userId] = {
-          userName: userName,
-          depo: {},
-          wd: {},
-        };
+      let contribution = await Contribution.findOne({ userId });
+
+      if (!contribution) {
+        contribution = new Contribution({
+          userId,
+          userName,
+          depo: new Map(),
+          wd: new Map(),
+        });
       }
 
-      if (!contributions[userId].wd["Clip Peluru DE"]) {
-        contributions[userId].wd["Clip Peluru DE"] = 0;
+      if (!contribution.wd.has(item)) {
+        contribution.wd.set(item, 0);
       }
 
-      contributions[userId].wd["Clip Peluru DE"] += amount;
+      contribution.wd.set(item, contribution.wd.get(item) + amount);
 
-      saveVaultData();
-      saveContributionsData();
-
-      await updateVaultChannel(interaction.client);
-
-      let totalMessage = "Bahan yang diambil :\n" + totalWithdrawn.join("\n");
-
-      await interaction.reply({
-        content: `\`\`\`Withdrawal ${amount} ${item} berhasil.\n${totalMessage}\`\`\``,
-      });
-    } else if (item === "Clip Peluru Python") {
-      let totalWithdrawn = [];
-
-      for (const [component, qty] of Object.entries(clipPeluruPython)) {
-        const totalQty = qty * amount;
-        let found = false;
-
-        for (const category of Object.keys(vault)) {
-          if (vault[category].hasOwnProperty(component)) {
-            if (vault[category][component] < totalQty) {
-              await interaction.reply({
-                content: `Jumlah ${component} tidak cukup untuk melakukan penarikan ${amount} clip peluru python.`,
-                ephemeral: true,
-              });
-              return;
-            }
-
-            vault[category][component] -= totalQty;
-            found = true;
-            break;
-          }
-        }
-
-        if (!found) {
-          await interaction.reply({
-            content: `${component} tidak ditemukan dalam brankas.`,
-            ephemeral: true,
-          });
-          return;
-        }
-
-        totalWithdrawn.push(`${component}: ${totalQty}`);
-      }
-
-      if (!contributions[userId]) {
-        contributions[userId] = {
-          userName: userName,
-          depo: {},
-          wd: {},
-        };
-      }
-
-      if (!contributions[userId].wd["Clip Peluru Python"]) {
-        contributions[userId].wd["Clip Peluru Python"] = 0;
-      }
-
-      contributions[userId].wd["Clip Peluru Python"] += amount;
-
-      saveVaultData();
-      saveContributionsData();
-
-      await updateVaultChannel(interaction.client);
-
-      let totalMessage = "Bahan yang diambil:\n" + totalWithdrawn.join("\n");
-
-      await interaction.reply({
-        content: `\`\`\`Withdrawal ${amount}  ${item} berhasil.\n${totalMessage}\`\`\``,
-      });
-    } else if (item === "Bahan Vest") {
-      let totalWithdrawn = [];
-
-      for (const [component, qty] of Object.entries(vest)) {
-        const totalQty = qty * amount;
-        let found = false;
-
-        for (const category of Object.keys(vault)) {
-          if (vault[category].hasOwnProperty(component)) {
-            if (vault[category][component] < totalQty) {
-              await interaction.reply({
-                content: `Jumlah ${component} tidak cukup untuk melakukan penarikan ${amount} clip peluru de.`,
-                ephemeral: true,
-              });
-              return;
-            }
-
-            vault[category][component] -= totalQty;
-            found = true;
-            break;
-          }
-        }
-
-        if (!found) {
-          await interaction.reply({
-            content: `${component} tidak ditemukan dalam brankas.`,
-            ephemeral: true,
-          });
-          return;
-        }
-
-        totalWithdrawn.push(`${component}: ${totalQty}`);
-      }
-
-      if (!contributions[userId]) {
-        contributions[userId] = {
-          userName: userName,
-          depo: {},
-          wd: {},
-        };
-      }
-
-      if (!contributions[userId].wd["Vest"]) {
-        contributions[userId].wd["Vest"] = 0;
-      }
-
-      contributions[userId].wd["Vest"] += amount;
-
-      saveVaultData();
-      saveContributionsData();
+      await vault.save();
+      await contribution.save();
 
       await updateVaultChannel(interaction.client);
 
@@ -276,350 +163,104 @@ module.exports = {
       await interaction.reply({
         content: `\`\`\`Withdrawal ${amount} ${item} berhasil.\n${totalMessage}\`\`\``,
       });
-    } else if (item === "Bahan Ginseng") {
-      let totalWithdrawn = [];
+    };
 
-      for (const [component, qty] of Object.entries(ginseng)) {
-        const totalQty = qty * amount;
-        let found = false;
+    switch (item) {
+      case "Clip Peluru De":
+        await processWithdrawal(clipPeluruDEComponents, item, amount);
+        break;
+      case "Clip Peluru Python":
+        await processWithdrawal(clipPeluruPython, item, amount);
+        break;
+      case "Bahan Vest":
+        await processWithdrawal(vest, item, amount);
+        break;
+      case "Bahan Ginseng":
+        const ginsengMultiplier = Math.ceil(amount / 5);
+        await processWithdrawal(ginseng, item, ginsengMultiplier);
+        break;
+      case "Clip Acp 45":
+        await processWithdrawal(acp45, item, amount);
+        break;
+      case "Clip AK":
+        await processWithdrawal(ak726, item, amount);
+        break;
+      case "Clip Sniper":
+        await processWithdrawal(bmg50, item, amount);
+        break;
+      case "Lockpick":
+        await processWithdrawal(lockpick, item, amount);
+        break;
+      default:
+        const category = interaction.options.getString("category");
+        const categoryDoc = vault.categories.find(
+          (cat) => cat.name === category
+        );
 
-        for (const category of Object.keys(vault)) {
-          if (vault[category].hasOwnProperty(component)) {
-            if (vault[category][component] < totalQty) {
-              await interaction.reply({
-                content: `Jumlah ${component} tidak cukup untuk melakukan penarikan ${amount} clip peluru de.`,
-                ephemeral: true,
-              });
-              return;
-            }
-
-            vault[category][component] -= totalQty;
-            found = true;
-            break;
-          }
-        }
-
-        if (!found) {
+        if (!categoryDoc) {
           await interaction.reply({
-            content: `${component} tidak ditemukan dalam brankas.`,
+            content: `Kategori ${category} tidak ada dalam brankas.`,
             ephemeral: true,
           });
           return;
         }
 
-        totalWithdrawn.push(`${component}: ${totalQty}`);
-      }
+        const itemDoc = categoryDoc.items.find((itm) => itm.name === item);
 
-      if (!contributions[userId]) {
-        contributions[userId] = {
-          userName: userName,
-          depo: {},
-          wd: {},
-        };
-      }
-
-      if (!contributions[userId].wd["Bahan Ginseng"]) {
-        contributions[userId].wd["Bahan Ginseng"] = 0;
-      }
-
-      contributions[userId].wd["Bahan Ginseng"] += amount;
-
-      saveVaultData();
-      saveContributionsData();
-      await updateVaultChannel(interaction.client);
-
-      let totalMessage = "Bahan yang diambil:\n" + totalWithdrawn.join("\n");
-
-      await interaction.reply({
-        content: `\`\`\`Withdrawal ${amount}  ${item} berhasil.\n${totalMessage}\`\`\``,
-      });
-    } else if (item === "Clip Acp 45") {
-      let totalWithdrawn = [];
-
-      for (const [component, qty] of Object.entries(acp45)) {
-        const totalQty = qty * amount;
-        let found = false;
-
-        for (const category of Object.keys(vault)) {
-          if (vault[category].hasOwnProperty(component)) {
-            if (vault[category][component] < totalQty) {
-              await interaction.reply({
-                content: `Jumlah ${component} tidak cukup untuk melakukan penarikan ${amount} clip peluru de.`,
-                ephemeral: true,
-              });
-              return;
-            }
-
-            vault[category][component] -= totalQty;
-            found = true;
-            break;
-          }
-        }
-
-        if (!found) {
+        if (!itemDoc) {
           await interaction.reply({
-            content: `${component} tidak ditemukan dalam brankas.`,
+            content: `Item ${item} tidak ada dalam kategori ${category}.`,
             ephemeral: true,
           });
           return;
         }
 
-        totalWithdrawn.push(`${component}: ${totalQty}`);
-      }
-
-      if (!contributions[userId]) {
-        contributions[userId] = {
-          userName: userName,
-          depo: {},
-          wd: {},
-        };
-      }
-
-      if (!contributions[userId].wd["Clip Acp 45"]) {
-        contributions[userId].wd["Clip Acp 45"] = 0;
-      }
-
-      contributions[userId].wd["Clip Acp 45"] += amount;
-
-      saveVaultData();
-      saveContributionsData();
-      await updateVaultChannel(interaction.client);
-
-      let totalMessage = "Bahan yang diambil:\n" + totalWithdrawn.join("\n");
-
-      await interaction.reply({
-        content: `\`\`\`Withdrawal ${amount}  ${item} berhasil.\n${totalMessage}\`\`\``,
-      });
-    } else if (item === "Clip AK") {
-      let totalWithdrawn = [];
-
-      for (const [component, qty] of Object.entries(ak726)) {
-        const totalQty = qty * amount;
-        let found = false;
-
-        for (const category of Object.keys(vault)) {
-          if (vault[category].hasOwnProperty(component)) {
-            if (vault[category][component] < totalQty) {
-              await interaction.reply({
-                content: `Jumlah ${component} tidak cukup untuk melakukan penarikan ${amount} clip peluru de.`,
-                ephemeral: true,
-              });
-              return;
-            }
-
-            vault[category][component] -= totalQty;
-            found = true;
-            break;
-          }
-        }
-
-        if (!found) {
+        if (itemDoc.quantity < amount) {
           await interaction.reply({
-            content: `${component} tidak ditemukan dalam brankas.`,
+            content: `Jumlah ${item} tidak cukup untuk melakukan penarikan.`,
             ephemeral: true,
           });
           return;
         }
 
-        totalWithdrawn.push(`${component}: ${totalQty}`);
-      }
+        itemDoc.quantity -= amount;
 
-      if (!contributions[userId]) {
-        contributions[userId] = {
-          userName: userName,
-          depo: {},
-          wd: {},
-        };
-      }
+        let contribution = await Contribution.findOne({ userId });
 
-      if (!contributions[userId].wd["Clip AK"]) {
-        contributions[userId].wd["Clip AK"] = 0;
-      }
-
-      contributions[userId].wd["Clip AK"] += amount;
-
-      saveVaultData();
-      saveContributionsData();
-      await updateVaultChannel(interaction.client);
-
-      let totalMessage = "Bahan yang diambil:\n" + totalWithdrawn.join("\n");
-
-      await interaction.reply({
-        content: `\`\`\`Withdrawal ${amount}  ${item} berhasil.\n${totalMessage}\`\`\``,
-      });
-    } else if (item === "Clip Sniper") {
-      let totalWithdrawn = [];
-
-      for (const [component, qty] of Object.entries(bmg50)) {
-        const totalQty = qty * amount;
-        let found = false;
-
-        for (const category of Object.keys(vault)) {
-          if (vault[category].hasOwnProperty(component)) {
-            if (vault[category][component] < totalQty) {
-              await interaction.reply({
-                content: `Jumlah ${component} tidak cukup untuk melakukan penarikan ${amount} clip peluru de.`,
-                ephemeral: true,
-              });
-              return;
-            }
-
-            vault[category][component] -= totalQty;
-            found = true;
-            break;
-          }
-        }
-
-        if (!found) {
-          await interaction.reply({
-            content: `${component} tidak ditemukan dalam brankas.`,
-            ephemeral: true,
+        if (!contribution) {
+          contribution = new Contribution({
+            userId,
+            userName,
+            depo: new Map(),
+            wd: new Map(),
           });
-          return;
         }
 
-        totalWithdrawn.push(`${component}: ${totalQty}`);
-      }
-
-      if (!contributions[userId]) {
-        contributions[userId] = {
-          userName: userName,
-          depo: {},
-          wd: {},
-        };
-      }
-
-      if (!contributions[userId].wd["Clip Sniper"]) {
-        contributions[userId].wd["Clip Sniper"] = 0;
-      }
-
-      contributions[userId].wd["Clip Sniper"] += amount;
-
-      saveVaultData();
-      saveContributionsData();
-      await updateVaultChannel(interaction.client);
-
-      let totalMessage = "Bahan yang diambil:\n" + totalWithdrawn.join("\n");
-
-      await interaction.reply({
-        content: `\`\`\`Withdrawal ${amount}  ${item} berhasil.\n${totalMessage}\`\`\``,
-      });
-    } else if (item === "Lockpick") {
-      let totalWithdrawn = [];
-
-      for (const [component, qty] of Object.entries(lockpick)) {
-        const totalQty = qty * amount;
-        let found = false;
-
-        for (const category of Object.keys(vault)) {
-          if (vault[category].hasOwnProperty(component)) {
-            if (vault[category][component] < totalQty) {
-              await interaction.reply({
-                content: `Jumlah ${component} tidak cukup untuk melakukan penarikan ${amount} clip peluru de.`,
-                ephemeral: true,
-              });
-              return;
-            }
-
-            vault[category][component] -= totalQty;
-            found = true;
-            break;
-          }
+        if (!contribution.wd.has(category)) {
+          contribution.wd.set(category, new Map());
         }
 
-        if (!found) {
-          await interaction.reply({
-            content: `${component} tidak ditemukan dalam brankas.`,
-            ephemeral: true,
-          });
-          return;
+        if (!contribution.wd.get(category).has(item)) {
+          contribution.wd.get(category).set(item, 0);
         }
 
-        totalWithdrawn.push(`${component}: ${totalQty}`);
-      }
+        contribution.wd
+          .get(category)
+          .set(item, contribution.wd.get(category).get(item) + amount);
 
-      if (!contributions[userId]) {
-        contributions[userId] = {
-          userName: userName,
-          depo: {},
-          wd: {},
-        };
-      }
+        await vault.save();
+        await contribution.save();
 
-      if (!contributions[userId].wd["Bahan Lockpick"]) {
-        contributions[userId].wd["Bahan Lockpick"] = 0;
-      }
+        await updateVaultChannel(interaction.client);
 
-      contributions[userId].wd["Bahan Lockpick"] += amount;
-
-      saveVaultData();
-      saveContributionsData();
-      await updateVaultChannel(interaction.client);
-
-      let totalMessage = "Bahan yang diambil:\n" + totalWithdrawn.join("\n");
-
-      await interaction.reply({
-        content: `\`\`\`Withdrawal ${amount}  ${item} berhasil.\n${totalMessage}\`\`\``,
-      });
-    } else {
-      const category = interaction.options.getString("category");
-
-      if (!vault.hasOwnProperty(category)) {
         await interaction.reply({
-          content: `Kategori ${category} tidak ada dalam brankas.`,
-          ephemeral: true,
+          content: `\`\`\`Withdrawal ${item} sebesar ${amount}, sisa ${item} sekarang ${itemDoc.quantity}.\`\`\``,
         });
-        return;
-      }
-
-      if (!vault[category].hasOwnProperty(item)) {
-        await interaction.reply({
-          content: `Item ${item} tidak ada dalam kategori ${category}.`,
-          ephemeral: true,
-        });
-        return;
-      }
-
-      if (vault[category][item] < amount) {
-        await interaction.reply({
-          content: `Jumlah ${item} tidak cukup untuk melakukan penarikan.`,
-          ephemeral: true,
-        });
-        return;
-      }
-
-      vault[category][item] -= amount;
-
-      if (!contributions[userId]) {
-        contributions[userId] = {
-          userName: userName,
-          depo: {},
-          wd: {},
-        };
-      }
-
-      if (!contributions[userId].wd[category]) {
-        contributions[userId].wd[category] = {};
-      }
-
-      if (!contributions[userId].wd[category][item]) {
-        contributions[userId].wd[category][item] = 0;
-      }
-
-      contributions[userId].wd[category][item] += amount;
-
-      saveVaultData();
-      saveContributionsData();
-
-      await updateVaultChannel(interaction.client);
-
-      await interaction.reply({
-        content: `\`\`\`Withdrawal ${item} sebesar ${amount}, sisa ${item} sekarang ${vault[category][item]}.\`\`\``,
-      });
     }
   },
   async autocomplete(interaction) {
     const focusedOption = interaction.options.getFocused(true);
+    const vault = await Vault.findOne();
     let choices = [];
 
     if (focusedOption.name === "item") {
@@ -636,10 +277,15 @@ module.exports = {
           "Lockpick",
         ];
       } else {
-        choices = Object.keys(vault[category]);
+        const categoryDoc = vault.categories.find(
+          (cat) => cat.name === category
+        );
+        if (categoryDoc) {
+          choices = categoryDoc.items.map((itm) => itm.name);
+        }
       }
     } else if (focusedOption.name === "category") {
-      choices = Object.keys(vault).concat("Crafting");
+      choices = vault.categories.map((cat) => cat.name).concat("Crafting");
     }
 
     const filtered = choices.filter((choice) =>

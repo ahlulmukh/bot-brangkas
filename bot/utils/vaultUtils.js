@@ -1,82 +1,70 @@
-const { EmbedBuilder } = require("discord.js");
-const fs = require("fs");
-const path = require("path");
+const Vault = require("../../models/Vault");
 
-const vaultDataPath = path.join(__dirname, "../data/vaultData.json");
-const contributionsDataPath = path.join(
-  __dirname,
-  "../data/contributionsData.json"
-);
-
-let vault = {
-  "barang disnaker": { kayu: 1000, botol: 500 },
-  "barang illegal": { "kunyit saset": 200, "pistol de": 5 },
-};
-
-let contributions = {};
-
-function saveVaultData() {
-  fs.writeFileSync(vaultDataPath, JSON.stringify(vault, null, 2));
-}
-
-function loadVaultData() {
-  if (fs.existsSync(vaultDataPath)) {
-    vault = JSON.parse(fs.readFileSync(vaultDataPath));
+async function loadVaultData() {
+  try {
+    let vault = await Vault.findOne();
+    if (!vault) {
+      vault = new Vault({
+        categories: [
+          {
+            name: "barang disnaker",
+            items: [
+              { name: "kayu", quantity: 1000 },
+              { name: "botol", quantity: 500 },
+            ],
+          },
+          {
+            name: "barang illegal",
+            items: [
+              { name: "kunyit saset", quantity: 200 },
+              { name: "pistol de", quantity: 5 },
+            ],
+          },
+        ],
+      });
+      await vault.save();
+    }
+    return vault;
+  } catch (error) {
+    console.error("Failed to load vault data", error);
   }
 }
 
-function saveContributionsData() {
-  fs.writeFileSync(
-    contributionsDataPath,
-    JSON.stringify(contributions, null, 2)
-  );
-}
-
-function loadContributionsData() {
-  if (fs.existsSync(contributionsDataPath)) {
-    contributions = JSON.parse(fs.readFileSync(contributionsDataPath));
+async function saveVaultData(vault) {
+  try {
+    await vault.save();
+  } catch (error) {
+    console.error("Failed to save vault data", error);
   }
 }
 
-function createVaultEmbed() {
+function createVaultEmbed(vault) {
+  const { EmbedBuilder } = require("discord.js");
+
   const embed = new EmbedBuilder()
     .setColor("#cc9900")
     .setTitle("Brangkas Mamoru")
     .setDescription("Brangkas Terupdate Saat Ini :")
-    .setThumbnail("https://i.ibb.co.com/YPdyVzQ/MAMORU-BULAT-NO-BG.png");
-  for (const [category, items] of Object.entries(vault)) {
+    .setThumbnail("https://i.ibb.co/YPdyVzQ/MAMORU-BULAT-NO-BG.png");
+
+  vault.categories.forEach((category) => {
     let fieldValue = "";
-    for (const [item, quantity] of Object.entries(items)) {
-      const formattedQuantity =
-        item === "Uang Merah" || item === "Uang Putih"
-          ? `Rp. ${quantity.toLocaleString()}`
-          : quantity.toLocaleString();
-      fieldValue += `${item}: ${formattedQuantity}\n`;
-    }
-    embed
-      .addFields({
-        name: category,
-        value: fieldValue,
-        inline: true,
-      })
-      .setTimestamp()
-      .setFooter({
-        text: "Mamoru The Black Moonlight",
-        iconURL: "https://i.ibb.co.com/YPdyVzQ/MAMORU-BULAT-NO-BG.png",
-      });
-  }
+    category.items.forEach((item) => {
+      fieldValue += `${item.name}: ${item.quantity}\n`;
+    });
+    embed.addFields({ name: category.name, value: fieldValue, inline: true });
+  });
+
+  embed.setTimestamp().setFooter({
+    text: "Mamoru The Black Moonlight",
+    iconURL: "https://i.ibb.co/YPdyVzQ/MAMORU-BULAT-NO-BG.png",
+  });
 
   return embed;
 }
 
-loadVaultData();
-loadContributionsData();
-
 module.exports = {
-  saveVaultData,
-  vault,
   loadVaultData,
+  saveVaultData,
   createVaultEmbed,
-  saveContributionsData,
-  contributions,
 };

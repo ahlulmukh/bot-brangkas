@@ -1,9 +1,4 @@
-const {
-  saveVaultData,
-  vault,
-  saveContributionsData,
-  contributions,
-} = require("../utils/vaultUtils");
+const { Vault, Contribution } = require("../../models"); // Pastikan untuk memperbarui path sesuai dengan struktur proyek Anda
 const { updateVaultChannel } = require("../utils/updateUtils");
 const { channelDepo } = require("../config.json");
 
@@ -18,13 +13,17 @@ module.exports = {
       });
       return;
     }
+
     const category = interaction.options.getString("category");
     const item = interaction.options.getString("item");
     const amount = interaction.options.getInteger("amount");
     const userId = interaction.user.id;
     const userName = interaction.user.username;
 
-    if (!vault.hasOwnProperty(category)) {
+    const vault = await Vault.findOne();
+    const categoryDoc = vault.categories.find((cat) => cat.name === category);
+
+    if (!categoryDoc) {
       await interaction.reply({
         content: `Kategori ${category} tidak ada dalam brankas.`,
         ephemeral: true,
@@ -32,7 +31,9 @@ module.exports = {
       return;
     }
 
-    if (!vault[category].hasOwnProperty(item)) {
+    const itemDoc = categoryDoc.items.find((itm) => itm.name === item);
+
+    if (!itemDoc) {
       await interaction.reply({
         content: `Item ${item} tidak ada dalam kategori ${category}.`,
         ephemeral: true,
@@ -40,43 +41,51 @@ module.exports = {
       return;
     }
 
-    vault[category][item] += amount;
+    itemDoc.quantity += amount;
+    await vault.save();
 
-    if (!contributions[userId]) {
-      contributions[userId] = {
-        userName: userName,
-        depo: {},
-        wd: {},
-      };
+    let contribution = await Contribution.findOne({ userId });
+
+    if (!contribution) {
+      contribution = new Contribution({
+        userId,
+        userName,
+        depo: new Map(),
+        wd: new Map(),
+      });
     }
 
-    if (!contributions[userId].depo[category]) {
-      contributions[userId].depo[category] = {};
+    if (!contribution.depo.has(category)) {
+      contribution.depo.set(category, new Map());
     }
 
-    if (!contributions[userId].depo[category][item]) {
-      contributions[userId].depo[category][item] = 0;
+    if (!contribution.depo.get(category).has(item)) {
+      contribution.depo.get(category).set(item, 0);
     }
 
-    contributions[userId].depo[category][item] += amount;
+    contribution.depo
+      .get(category)
+      .set(item, contribution.depo.get(category).get(item) + amount);
 
-    saveVaultData();
-    saveContributionsData();
+    await contribution.save();
+
     await updateVaultChannel(interaction.client);
     await interaction.reply({
-      content: `\`\`\`Deposit ${item} sebesar ${amount} berhasil, total ${item} sekarang ${vault[category][item]}.\`\`\``,
+      content: `\`\`\`Deposit ${item} sebesar ${amount} berhasil, total ${item} sekarang ${itemDoc.quantity}.\`\`\``,
     });
   },
   async autocomplete(interaction) {
     const focusedOption = interaction.options.getFocused(true);
+    const vault = await Vault.findOne();
     let choices = [];
 
     if (focusedOption.name === "category") {
-      choices = Object.keys(vault);
+      choices = vault.categories.map((cat) => cat.name);
     } else if (focusedOption.name === "item") {
       const category = interaction.options.getString("category");
-      if (vault.hasOwnProperty(category)) {
-        choices = Object.keys(vault[category]);
+      const categoryDoc = vault.categories.find((cat) => cat.name === category);
+      if (categoryDoc) {
+        choices = categoryDoc.items.map((itm) => itm.name);
       }
     }
 

@@ -1,42 +1,167 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Admin Dashboard</title>
-    <link rel="stylesheet" type="text/css" href="/styles.css" />
-  </head>
-  <body>
-    <h1>Admin Dashboard</h1>
-    <table>
-      <thead>
-        <tr>
-          <th>Category</th>
-          <th>Item</th>
-          <th>Quantity</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% for (let category in vault) { %> <% for (let item in vault[category])
-        { %>
-        <tr>
-          <td><%= category %></td>
-          <td><%= item %></td>
-          <td><%= vault[category][item] %></td>
-          <td>
-            <form action="/api/edit-item" method="post">
-              <input type="hidden" name="category" value="<%= category %>" />
-              <input type="hidden" name="item" value="<%= item %>" />
-              <input
-                type="number"
-                name="quantity"
-                value="<%= vault[category][item] %>"
-              />
-              <button type="submit">Update</button>
-            </form>
-          </td>
-        </tr>
-        <% } %> <% } %>
-      </tbody>
-    </table>
-  </body>
-</html>
+<%- include('partials/header', { title: 'Dashboard Mamoru' }) %>
+<div class="container-xxl position-relative bg-white d-flex p-0">
+  <!-- Sidebar Start -->
+  <%- include('partials/sidebar', { user: user }) %>
+  <!-- Sidebar End -->
+
+  <div class="content">
+    <!-- Navbar Start -->
+    <nav
+      class="navbar navbar-expand bg-light navbar-light sticky-top px-4 py-0"
+    >
+      <a href="/" class="navbar-brand d-flex d-lg-none me-4">
+        <h2 class="text-primary mb-0"><i class="fa fa-hashtag"></i></h2>
+      </a>
+      <a href="#" class="sidebar-toggler flex-shrink-0">
+        <i class="fa fa-bars"></i>
+      </a>
+      <form class="d-none d-md-flex ms-4">
+        <input
+          class="form-control border-0"
+          type="search"
+          placeholder="Search"
+        />
+      </form>
+      <div class="navbar-nav align-items-center ms-auto">
+        <div class="nav-item dropdown">
+          <a
+            href="#"
+            class="nav-link dropdown-toggle"
+            data-bs-toggle="dropdown"
+          >
+            <img
+              class="rounded-circle me-lg-2"
+              src="img/user.jpg"
+              alt=""
+              style="width: 40px; height: 40px"
+            />
+            <span class="d-none d-lg-inline-flex">John Doe</span>
+          </a>
+          <div
+            class="dropdown-menu dropdown-menu-end bg-light border-0 rounded-0 rounded-bottom m-0"
+          >
+            <a href="#" class="dropdown-item">My Profile</a>
+            <a href="#" class="dropdown-item">Settings</a>
+            <a href="#" class="dropdown-item">Log Out</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <!-- Navbar End -->
+
+    <div id="mainContent">
+      <div class="container-fluid pt-4 px-4">
+        <div class="row g-4">
+          <div class="col-sm-6 col-xl-3">
+            <div
+              class="bg-light rounded d-flex align-items-center justify-content-between p-4"
+            >
+              <i class="fa fa-chart-line fa-3x text-primary"></i>
+              <div class="ms-3">
+                <p class="mb-2">Depo Hari Ini</p>
+                <h6 class="mb-0">0</h6>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-xl-3">
+            <div
+              class="bg-light rounded d-flex align-items-center justify-content-between p-4"
+            >
+              <i class="fa fa-chart-bar fa-3x text-primary"></i>
+              <div class="ms-3">
+                <p class="mb-2">Wd Hari ini</p>
+                <h6 class="mb-0">0</h6>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-xl-3">
+            <div
+              class="bg-light rounded d-flex align-items-center justify-content-between p-4"
+            >
+              <i class="fa fa-chart-area fa-3x text-primary"></i>
+              <div class="ms-3">
+                <p class="mb-2">Total Depo</p>
+                <h6 class="mb-0">0</h6>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-xl-3">
+            <div
+              class="bg-light rounded d-flex align-items-center justify-content-between p-4"
+            >
+              <i class="fa fa-chart-pie fa-3x text-primary"></i>
+              <div class="ms-3">
+                <p class="mb-2">Total WD</p>
+                <h6 class="mb-0">0</h6>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="container-fluid pt-4 px-4">
+        <div class="row g-4">
+          <div class="col-sm-12 col-md-6 col-xl-12">
+            <div class="h-100 bg-light rounded p-4">
+              <div
+                class="d-flex align-items-center justify-content-between mb-2"
+              >
+                <h6 class="mb-0">Messages</h6>
+                <a href="">Show All</a>
+              </div>
+              <div class="d-flex align-items-center border-bottom py-3">
+                <img
+                  class="rounded-circle flex-shrink-0"
+                  src="img/user.jpg"
+                  alt=""
+                  style="width: 40px; height: 40px"
+                />
+                <div class="w-100 ms-3">
+                  <div class="d-flex w-100 justify-content-between">
+                    <h6 class="mb-0">Jhon Doe</h6>
+                    <small>15 minutes ago</small>
+                  </div>
+                  <span>Short message goes here...</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Widgets End -->
+    </div>
+
+    <!-- Form Edit -->
+    <%- include('partials/editForm') %>
+    <!-- Footer Start -->
+    <%- include('partials/footer') %>
+    <!-- Footer End -->
+  </div>
+</div>
+
+<script>
+  document
+    .getElementById("updateDataBtn")
+    .addEventListener("click", async () => {
+      try {
+        const response = await fetch("/api/table");
+        const tableHtml = await response.text();
+        document.getElementById("mainContent").innerHTML = tableHtml;
+      } catch (error) {
+        console.error("Error fetching table data:", error);
+      }
+    });
+
+  document.addEventListener("click", function (event) {
+    if (event.target.classList.contains("btn-edit")) {
+      const category = event.target.getAttribute("data-category");
+      const item = event.target.getAttribute("data-item");
+      const quantity = event.target.getAttribute("data-quantity");
+
+      document.getElementById("editForm").classList.remove("d-none");
+      document.getElementById("mainContent").classList.add("d-none");
+      document.getElementById("kategori").value = category;
+      document.getElementById("namaitem").value = item;
+      document.getElementById("quantity").value = quantity;
+    }
+  });
+</script>

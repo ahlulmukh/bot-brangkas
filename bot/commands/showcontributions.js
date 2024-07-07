@@ -1,45 +1,49 @@
 const { EmbedBuilder } = require("discord.js");
-const { contributions } = require("../utils/vaultUtils");
+const { Contribution } = require("../../models"); // Pastikan untuk memperbarui path sesuai dengan struktur proyek Anda
 
 module.exports = {
   name: "showcontributions",
   description: "Data-Data anggota yang menyetor",
   async execute(interaction) {
+    const contributions = await Contribution.find();
+
     const embed = new EmbedBuilder()
       .setTitle("Kontribusi Anggota")
       .setColor("#00FF00");
 
-    for (const [userId, data] of Object.entries(contributions)) {
-      let userContributions = `Total Deposit: ${Object.values(data.depo).reduce(
-        (acc, cat) => acc + Object.values(cat).reduce((a, b) => a + b, 0),
+    contributions.forEach((data) => {
+      let userContributions = `Total Deposit: ${Array.from(
+        data.depo.values()
+      ).reduce(
+        (acc, cat) => acc + Array.from(cat.values()).reduce((a, b) => a + b, 0),
         0
-      )}\nTotal Withdrawal: ${Object.values(data.wd).reduce(
-        (acc, cat) => acc + Object.values(cat).reduce((a, b) => a + b, 0),
+      )}\nTotal Withdrawal: ${Array.from(data.wd.values()).reduce(
+        (acc, cat) => acc + Array.from(cat.values()).reduce((a, b) => a + b, 0),
         0
       )}\n`;
 
       userContributions += "\nDeposit:\n";
-      for (const [category, items] of Object.entries(data.depo)) {
+      data.depo.forEach((items, category) => {
         userContributions += `  ${category}:\n`;
-        for (const [item, amount] of Object.entries(items)) {
+        items.forEach((amount, item) => {
           userContributions += `    ${item}: ${amount}\n`;
-        }
-      }
+        });
+      });
 
       userContributions += "\nWithdrawal:\n";
-      for (const [category, items] of Object.entries(data.wd)) {
+      data.wd.forEach((items, category) => {
         userContributions += `  ${category}:\n`;
-        for (const [item, amount] of Object.entries(items)) {
+        items.forEach((amount, item) => {
           userContributions += `    ${item}: ${amount}\n`;
-        }
-      }
+        });
+      });
 
       embed.addFields({
         name: data.userName,
         value: userContributions,
         inline: true,
       });
-    }
+    });
 
     await interaction.reply({ embeds: [embed] });
   },

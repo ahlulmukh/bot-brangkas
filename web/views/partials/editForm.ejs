@@ -1,0 +1,72 @@
+<!-- Form Start -->
+<div class="container-fluid pt-4 px-4 d-none" id="editForm">
+  <div class="row g-4">
+    <div class="col-sm-12 col-xl-6">
+      <div class="bg-light rounded h-100 p-4">
+        <h6 class="mb-4">Update Data Brangkas</h6>
+        <form id="updateForm">
+          <div class="row mb-3">
+            <label for="kategori" class="col-sm-2 col-form-label"
+              >Kategori</label
+            >
+            <div class="col-sm-10">
+              <input type="text" class="form-control" id="kategori" readonly />
+            </div>
+          </div>
+          <div class="row mb-3">
+            <label for="namaitem" class="col-sm-2 col-form-label"
+              >Nama Item</label
+            >
+            <div class="col-sm-10">
+              <input type="text" class="form-control" id="namaitem" readonly />
+            </div>
+          </div>
+          <div class="row mb-3">
+            <label for="quantity" class="col-sm-2 col-form-label">Total</label>
+            <div class="col-sm-10">
+              <input type="number" class="form-control" id="quantity" />
+            </div>
+          </div>
+          <div class="row mb-3"></div>
+          <button type="submit" class="btn btn-primary">Update Now</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Form End -->
+
+<script>
+  document
+    .getElementById("updateForm")
+    .addEventListener("submit", async function (event) {
+      event.preventDefault();
+
+      const category = document.getElementById("kategori").value;
+      const item = document.getElementById("namaitem").value;
+      const quantity = document.getElementById("quantity").value;
+
+      try {
+        const response = await fetch("/api/edit-item", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ category, item, quantity }),
+        });
+
+        const result = await response.json();
+        if (result.success) {
+          alert("Data updated successfully");
+          // Hide edit form and show table data
+          document.getElementById("editForm").classList.add("d-none");
+          document.getElementById("mainContent").classList.remove("d-none");
+          document.getElementById("updateDataBtn").click();
+        } else {
+          alert("Error updating data: " + result.error);
+        }
+      } catch (error) {
+        console.error("Error updating data:", error);
+      }
+    });
+</script>

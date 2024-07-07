@@ -1,14 +1,15 @@
 const { guildId, channelId } = require("../config.json");
-const { createVaultEmbed } = require("./vaultUtils");
+const { createVaultEmbed, loadVaultData } = require("./vaultUtils");
 
 async function updateVaultChannel(client) {
   try {
     const guild = await client.guilds.fetch(guildId);
     const channel = await guild.channels.fetch(channelId);
+    const vault = await loadVaultData();
     if (channel) {
       const messageData = require("../data/messageData.json");
       const message = await channel.messages.fetch(messageData.messageId);
-      updateVaultMessage(message);
+      updateVaultMessage(message, vault);
     }
   } catch (error) {
     console.log(
@@ -19,7 +20,8 @@ async function updateVaultChannel(client) {
 }
 
 async function createVaultMessage(channel) {
-  const embed = createVaultEmbed();
+  const vault = await loadVaultData();
+  const embed = createVaultEmbed(vault);
   const message = await channel.send({ embeds: [embed] });
   const messageData = {
     channelId: channel.id,
@@ -32,8 +34,8 @@ async function createVaultMessage(channel) {
   );
 }
 
-function updateVaultMessage(message) {
-  const embed = createVaultEmbed();
+function updateVaultMessage(message, vault) {
+  const embed = createVaultEmbed(vault);
   message.edit({ embeds: [embed] });
 }
 
