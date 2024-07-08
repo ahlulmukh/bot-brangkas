@@ -4,8 +4,8 @@ const path = require("path");
 const session = require("express-session");
 const flash = require("connect-flash");
 const mongoose = require("mongoose");
-const apiRouter = require("./routes/api"); // Import router API
-const authRouter = require("./routes/auth"); // Import router Auth
+const apiRouter = require("./routes/api");
+const authRouter = require("./routes/auth");
 const { isAuthenticated, isPengurus } = require("./middleware/auth");
 const Vault = require("../models/Vault");
 require("dotenv").config();
@@ -28,15 +28,14 @@ app.use(
     secret: "your-secret-key",
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false }, // Gunakan true jika menggunakan HTTPS
+    cookie: { secure: false },
   })
 );
 app.use(flash());
 app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views")); // Set folder views
+app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public")));
 
-// Middleware untuk menambahkan flash messages ke res.locals
 app.use((req, res, next) => {
   res.locals.success_msg = req.flash("success_msg");
   res.locals.error_msg = req.flash("error_msg");
@@ -44,10 +43,8 @@ app.use((req, res, next) => {
   next();
 });
 
-// Route untuk login dan registrasi
 app.use("/auth", authRouter);
 
-// Middleware untuk menyediakan user ke semua views
 app.use((req, res, next) => {
   if (req.session.user) {
     res.locals.user = req.session.user;
@@ -55,18 +52,15 @@ app.use((req, res, next) => {
   next();
 });
 
-// Middleware untuk menyediakan user ke semua views
 app.use((req, res, next) => {
   res.locals.user = req.session.user;
   next();
 });
 
-// Route untuk login
 app.get("/login", (req, res) => {
   res.render("login");
 });
 
-// Route untuk Data Brangkas
 app.get("/table", async (req, res) => {
   try {
     const vault = await Vault.findOne();
@@ -77,7 +71,6 @@ app.get("/table", async (req, res) => {
   }
 });
 
-// Route untuk Depo Data Brangkas
 app.get("/depo", async (req, res) => {
   try {
     res.render("depo/data");
@@ -87,17 +80,14 @@ app.get("/depo", async (req, res) => {
   }
 });
 
-// Route untuk login
 app.get("/register", (req, res) => {
   res.render("register");
 });
 
-// Route untuk dashboard
 app.get("/", isAuthenticated, (req, res) => {
   res.render("index", { role: req.session.user.role });
 });
 
-// Menggunakan router API dengan proteksi
 app.use("/api", isAuthenticated, apiRouter);
 app.use("/api/edit-item", isPengurus, apiRouter);
 
