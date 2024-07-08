@@ -68,11 +68,21 @@ app.get("/login", (req, res) => {
   res.render("login");
 });
 
-// Route untuk login
+// Route untuk Data Brangkas
 app.get("/table", async (req, res) => {
   try {
     const vault = await Vault.findOne();
     res.render("databrangkas/table", { vault });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+// Route untuk Depo Data Brangkas
+app.get("/depo", async (req, res) => {
+  try {
+    res.render("depo/data");
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal Server Error");

@@ -140,4 +140,68 @@ router.get("/table", async (req, res) => {
   }
 });
 
+router.post("/delete-item", async (req, res) => {
+  const { category, item } = req.body;
+
+  try {
+    const vault = await Vault.findOne();
+    if (!vault) {
+      return res.status(400).json({ error: `Kategori ${category} tidak ada.` });
+    }
+
+    const categoryDoc = vault.categories.find((cat) => cat.name === category);
+    if (!categoryDoc) {
+      return res.status(400).json({ error: `Kategori ${category} tidak ada.` });
+    }
+
+    const itemIndex = categoryDoc.items.findIndex((itm) => itm.name === item);
+    if (itemIndex === -1) {
+      return res
+        .status(400)
+        .json({ error: `Item ${item} tidak ada dalam kategori ${category}.` });
+    }
+
+    categoryDoc.items.splice(itemIndex, 1);
+    await vault.save();
+
+    return res.json({
+      success: true,
+      message: `Item ${item} dari kategori ${category} berhasil dihapus.`,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+// API Endpoint untuk menghapus kategori
+router.post("/delete-category", async (req, res) => {
+  const { category } = req.body;
+
+  try {
+    const vault = await Vault.findOne();
+    if (!vault) {
+      return res.status(400).json({ error: `Kategori ${category} tidak ada.` });
+    }
+
+    const categoryIndex = vault.categories.findIndex(
+      (cat) => cat.name === category
+    );
+    if (categoryIndex === -1) {
+      return res.status(400).json({ error: `Kategori ${category} tidak ada.` });
+    }
+
+    vault.categories.splice(categoryIndex, 1);
+    await vault.save();
+
+    return res.json({
+      success: true,
+      message: `Kategori ${category} berhasil dihapus.`,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
 module.exports = router;

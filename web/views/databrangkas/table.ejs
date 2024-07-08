@@ -44,6 +44,13 @@
                       >
                         Edit
                       </button>
+                      <button
+                        class="btn btn-danger btn-delete"
+                        data-category="<%= category.name %>"
+                        data-item="<%= item.name %>"
+                      >
+                        Hapus
+                      </button>
                     </td>
                   </tr>
                   <% }) %> <% }) %>
@@ -143,6 +150,30 @@
           alert("Error: " + xhr.responseJSON.error);
         },
       });
+    });
+
+    $(".btn-delete").on("click", function () {
+      const category = $(this).data("category");
+      const item = $(this).data("item");
+
+      if (
+        confirm(
+          `Apakah Anda yakin ingin menghapus item ${item} dari kategori ${category}?`
+        )
+      ) {
+        $.ajax({
+          type: "POST",
+          url: "/api/delete-item",
+          data: { category, item },
+          success: function (response) {
+            alert(response.message);
+            location.reload();
+          },
+          error: function (xhr) {
+            alert("Error: " + xhr.responseJSON.error);
+          },
+        });
+      }
     });
   });
 </script>
