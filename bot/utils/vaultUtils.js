@@ -1,7 +1,16 @@
 const Vault = require("../../models/Vault");
+const mongoose = require("mongoose");
+const { EmbedBuilder } = require("discord.js");
 
 async function loadVaultData() {
   try {
+    await mongoose.connect(
+      "mongodb+srv://ahlulmukh:Mukh2001@cluster0.gch0omi.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+      {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      }
+    );
     let vault = await Vault.findOne();
     if (!vault) {
       vault = new Vault({
@@ -39,8 +48,6 @@ async function saveVaultData(vault) {
 }
 
 function createVaultEmbed(vault) {
-  const { EmbedBuilder } = require("discord.js");
-
   const embed = new EmbedBuilder()
     .setColor("#cc9900")
     .setTitle("Brangkas Mamoru")
@@ -50,9 +57,17 @@ function createVaultEmbed(vault) {
   vault.categories.forEach((category) => {
     let fieldValue = "";
     category.items.forEach((item) => {
-      fieldValue += `${item.name}: ${item.quantity}\n`;
+      const formattedQuantity =
+        item.name === "Uang Merah" || item.name === "Uang Putih"
+          ? `Rp. ${item.quantity.toLocaleString()}`
+          : item.quantity.toLocaleString();
+      fieldValue += `${item.name}: ${formattedQuantity}\n`;
     });
-    embed.addFields({ name: category.name, value: fieldValue, inline: true });
+    embed.addFields({
+      name: category.name,
+      value: fieldValue,
+      inline: true,
+    });
   });
 
   embed.setTimestamp().setFooter({

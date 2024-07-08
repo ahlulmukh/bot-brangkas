@@ -72,7 +72,7 @@ client.once("ready", async () => {
     await registerSlashCommands(guild);
 
     // Mulai mekanisme polling
-    setInterval(checkForUpdates, 5000); // Cek setiap 5 detik
+    //  setInterval(checkForUpdates, 5000); // Cek setiap 5 detik
   } catch (error) {
     console.log("Guild atau Channel tidak ditemukan.", error);
   }
@@ -206,19 +206,19 @@ async function registerSlashCommands(guild) {
   await guild.commands.set(commands);
 }
 
-async function checkForUpdates() {
-  try {
-    const response = await axios.get(`${apiBaseUrl}/api/check-updates`);
-    const newData = response.data;
+// async function checkForUpdates() {
+//   try {
+//     const response = await axios.get(`${apiBaseUrl}/api/check-updates`);
+//     const newData = response.data;
 
-    const currentVault = await loadVaultData();
-    if (JSON.stringify(newData) !== JSON.stringify(currentVault)) {
-      Object.assign(currentVault, newData); // Update data dalam memori
-      await saveVaultData(currentVault); // Simpan perubahan jika diperlukan
-      await updateVaultChannel(client); // Update channel vault di Discord
-      console.log("Vault data updated from web dashboard");
-    }
-  } catch (error) {
-    console.error("Error checking for updates:", error);
-  }
-}
+//     const currentVault = await loadVaultData();
+//     if (JSON.stringify(newData) !== JSON.stringify(currentVault)) {
+//       Object.assign(currentVault, newData);
+//       await saveVaultData(currentVault);
+//       await updateVaultChannel(client);
+//       console.log("Vault data updated from web dashboard");
+//     }
+//   } catch (error) {
+//     console.error("Error checking for updates:", error);
+//   }
+// }

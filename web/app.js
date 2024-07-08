@@ -10,7 +10,7 @@ const { isAuthenticated, isPengurus } = require("./middleware/auth");
 const Vault = require("../models/Vault");
 
 const app = express();
-const port = 3000;
+const port = 1955;
 
 mongoose
   .connect(

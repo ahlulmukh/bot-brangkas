@@ -1,4 +1,4 @@
-const { Vault, Contribution } = require("../../models"); // Pastikan untuk memperbarui path sesuai dengan struktur proyek Anda
+const { Vault, Contribution } = require("../../models");
 const { updateVaultChannel } = require("../utils/updateUtils");
 const { channelDepo } = require("../config.json");
 

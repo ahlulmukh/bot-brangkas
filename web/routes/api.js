@@ -109,16 +109,6 @@ router.get("/check-updates", async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 });
-// Endpoint untuk cek perubahan data
-router.get("/check-updates", async (req, res) => {
-  try {
-    const vault = await Vault.findOne();
-    res.json(vault);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Internal Server Error");
-  }
-});
 
 router.get("/vault-data", async (req, res) => {
   try {
