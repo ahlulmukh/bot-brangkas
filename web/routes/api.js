@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const Vault = require("../../models/Vault");
 
-// API Endpoint untuk menambahkan kategori baru
 router.post("/add-category", async (req, res) => {
   const { category } = req.body;
 
@@ -33,7 +32,6 @@ router.post("/add-category", async (req, res) => {
   }
 });
 
-// API Endpoint untuk menambahkan item baru ke kategori
 router.post("/add-item", async (req, res) => {
   const { category, item, quantity } = req.body;
 
@@ -99,7 +97,6 @@ router.post("/edit-item", async (req, res) => {
   }
 });
 
-// Endpoint untuk cek perubahan data
 router.get("/check-updates", async (req, res) => {
   try {
     const vault = await Vault.findOne();
@@ -164,7 +161,6 @@ router.post("/delete-item", async (req, res) => {
   }
 });
 
-// API Endpoint untuk menghapus kategori
 router.post("/delete-category", async (req, res) => {
   const { category } = req.body;
 

@@ -1,5 +1,5 @@
 const { EmbedBuilder } = require("discord.js");
-const { Contribution } = require("../../models"); // Pastikan untuk memperbarui path sesuai dengan struktur proyek Anda
+const { Contribution } = require("../../models");
 
 module.exports = {
   name: "showcontributions",

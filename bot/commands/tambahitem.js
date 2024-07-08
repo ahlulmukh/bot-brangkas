@@ -1,4 +1,4 @@
-const { Vault } = require("../../models"); // Pastikan untuk memperbarui path sesuai dengan struktur proyek Anda
+const { Vault } = require("../../models");
 const { updateVaultChannel } = require("../utils/updateUtils");
 
 module.exports = {
