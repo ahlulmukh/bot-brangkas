@@ -1,4 +1,4 @@
-const { Vault, Contribution } = require("../../models"); // Pastikan untuk memperbarui path sesuai dengan struktur proyek Anda
+const { Vault } = require("../../models");
 const { updateVaultChannel } = require("../utils/updateUtils");
 const { channelWd } = require("../config.json");
 
@@ -12,7 +12,7 @@ const clipPeluruDEComponents = {
   Emas: 12,
 };
 
-const clipPeluruPython = {
+const clipPeluruPythonComponents = {
   "Paket Andaliman": 2,
   "Minyak Paket": 8,
   "Papan Kemasan": 12,
@@ -22,7 +22,7 @@ const clipPeluruPython = {
   Botol: 35,
 };
 
-const vest = {
+const vestComponents = {
   Kulit: 2,
   Berlian: 2,
   "Cairan Karet": 3,
@@ -35,14 +35,14 @@ const vest = {
   Tembaga: 35,
 };
 
-const ginseng = {
+const ginsengComponents = {
   Garam: 2,
   "Kunyit Saset": 2,
   Gula: 3,
   Botol: 4,
 };
 
-const acp45 = {
+const acp45Components = {
   "Paket Andaliman": 2,
   "Minyak Paket": 6,
   "Papan Kemasan": 7,
@@ -52,7 +52,7 @@ const acp45 = {
   Botol: 35,
 };
 
-const ak726 = {
+const ak726Components = {
   "Paket Andaliman": 2,
   "Minyak Paket": 8,
   "Papan Kemasan": 13,
@@ -62,7 +62,7 @@ const ak726 = {
   Botol: 40,
 };
 
-const bmg50 = {
+const bmg50Components = {
   "Paket Andaliman": 3,
   "Papan Kemasan": 12,
   "Minyak Paket": 12,
@@ -72,7 +72,7 @@ const bmg50 = {
   Botol: 40,
 };
 
-const lockpick = {
+const lockpickComponents = {
   "Minyak Paket": 5,
   Emas: 10,
   Besi: 12,
@@ -136,26 +136,7 @@ module.exports = {
         totalWithdrawn.push(`${component}: ${totalQty}`);
       }
 
-      let contribution = await Contribution.findOne({ userId });
-
-      if (!contribution) {
-        contribution = new Contribution({
-          userId,
-          userName,
-          depo: new Map(),
-          wd: new Map(),
-        });
-      }
-
-      if (!contribution.wd.has(item)) {
-        contribution.wd.set(item, 0);
-      }
-
-      contribution.wd.set(item, contribution.wd.get(item) + amount);
-
       await vault.save();
-      await contribution.save();
-
       await updateVaultChannel(interaction.client);
 
       let totalMessage = "Bahan yang diambil:\n" + totalWithdrawn.join("\n");
@@ -170,26 +151,26 @@ module.exports = {
         await processWithdrawal(clipPeluruDEComponents, item, amount);
         break;
       case "Clip Peluru Python":
-        await processWithdrawal(clipPeluruPython, item, amount);
+        await processWithdrawal(clipPeluruPythonComponents, item, amount);
         break;
       case "Bahan Vest":
-        await processWithdrawal(vest, item, amount);
+        await processWithdrawal(vestComponents, item, amount);
         break;
       case "Bahan Ginseng":
         const ginsengMultiplier = Math.ceil(amount / 5);
-        await processWithdrawal(ginseng, item, ginsengMultiplier);
+        await processWithdrawal(ginsengComponents, item, ginsengMultiplier);
         break;
       case "Clip Acp 45":
-        await processWithdrawal(acp45, item, amount);
+        await processWithdrawal(acp45Components, item, amount);
         break;
       case "Clip AK":
-        await processWithdrawal(ak726, item, amount);
+        await processWithdrawal(ak726Components, item, amount);
         break;
       case "Clip Sniper":
-        await processWithdrawal(bmg50, item, amount);
+        await processWithdrawal(bmg50Components, item, amount);
         break;
       case "Lockpick":
-        await processWithdrawal(lockpick, item, amount);
+        await processWithdrawal(lockpickComponents, item, amount);
         break;
       default:
         const category = interaction.options.getString("category");
@@ -225,32 +206,7 @@ module.exports = {
 
         itemDoc.quantity -= amount;
 
-        let contribution = await Contribution.findOne({ userId });
-
-        if (!contribution) {
-          contribution = new Contribution({
-            userId,
-            userName,
-            depo: new Map(),
-            wd: new Map(),
-          });
-        }
-
-        if (!contribution.wd.has(category)) {
-          contribution.wd.set(category, new Map());
-        }
-
-        if (!contribution.wd.get(category).has(item)) {
-          contribution.wd.get(category).set(item, 0);
-        }
-
-        contribution.wd
-          .get(category)
-          .set(item, contribution.wd.get(category).get(item) + amount);
-
         await vault.save();
-        await contribution.save();
-
         await updateVaultChannel(interaction.client);
 
         await interaction.reply({

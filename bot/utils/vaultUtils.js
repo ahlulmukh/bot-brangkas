@@ -1,16 +1,14 @@
 const Vault = require("../../models/Vault");
 const mongoose = require("mongoose");
 const { EmbedBuilder } = require("discord.js");
+require("dotenv").config();
 
 async function loadVaultData() {
   try {
-    await mongoose.connect(
-      "mongodb+srv://ahlulmukh:Mukh2001@cluster0.gch0omi.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
-      {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      }
-    );
+    await mongoose.connect(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
     let vault = await Vault.findOne();
     if (!vault) {
       vault = new Vault({

@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 const { loadVaultData, saveVaultData } = require("./utils/vaultUtils");
 const { saveMessageData, messageData } = require("./utils/messageUtils");
 const { token, guildId, channelId, apiBaseUrl } = require("./config.json");
+require("dotenv").config();
 
 const {
   updateVaultChannel,
@@ -34,13 +35,10 @@ for (const file of commandFiles) {
 }
 
 mongoose
-  .connect(
-    "mongodb+srv://ahlulmukh:Mukh2001@cluster0.gch0omi.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
-    {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    }
-  )
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.log(err));
 

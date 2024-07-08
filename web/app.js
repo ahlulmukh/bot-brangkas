@@ -8,18 +8,16 @@ const apiRouter = require("./routes/api"); // Import router API
 const authRouter = require("./routes/auth"); // Import router Auth
 const { isAuthenticated, isPengurus } = require("./middleware/auth");
 const Vault = require("../models/Vault");
+require("dotenv").config();
 
 const app = express();
 const port = 1955;
 
 mongoose
-  .connect(
-    "mongodb+srv://ahlulmukh:Mukh2001@cluster0.gch0omi.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
-    {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    }
-  )
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.log(err));
 
