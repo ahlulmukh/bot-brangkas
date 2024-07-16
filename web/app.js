@@ -11,7 +11,7 @@ const Vault = require("../models/Vault");
 require("dotenv").config();
 
 const app = express();
-const port = 1955;
+const port = 1954;
 
 mongoose
   .connect(process.env.MONGO_URI, {
